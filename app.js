@@ -18,15 +18,15 @@ function updateSoundUI(){
 function stopMusic(){clearInterval(timer);timer=null;voices.forEach(v=>{try{v.stop()}catch{}});voices.clear();}
 function note(midi, when, duration, volume){
   const osc=audio.createOscillator(), gain=audio.createGain();
-  osc.type='sine';osc.frequency.value=440*2**((midi-69)/12);
+  osc.setPeriodicWave(audio.createPeriodicWave(new Float32Array([0,0,0,0,0]),new Float32Array([0,1,.24,.07,.025])));osc.frequency.value=440*2**((midi-69)/12);
   gain.gain.setValueAtTime(0,when);gain.gain.linearRampToValueAtTime(volume,when+.035);gain.gain.exponentialRampToValueAtTime(.0001,when+duration);
   osc.connect(gain);gain.connect(master);osc.start(when);osc.stop(when+duration);voices.add(osc);osc.onended=()=>{voices.delete(osc);osc.disconnect();gain.disconnect()};
 }
 function startMusic(){
   stopMusic();if(!soundOn||!current||!audio||document.hidden)return;
   beat=0;
-  const tick=()=>{const chord=tracks[current].notes;const t=audio.currentTime+.02;note(chord[[0,2,1,3,2,1,3,2][beat%8]]+12,t,1.3,.09);if(beat%4===0){chord.slice(0,3).forEach(n=>note(n-12,t,2.4,.045))}beat++};
-  tick();timer=setInterval(tick,430);
+  const tick=()=>{const base=tracks[current].notes;const progression=[0,-2,-5,-2][Math.floor(beat/8)%4];const chord=base.map(n=>n+progression);const t=audio.currentTime+.02;note(chord[beat%4===2?2:0]-24,t,.65,.11);if(beat%2===0){chord.forEach((n,i)=>note(n,t+.07+i*.012,1.65,.033))}if(beat%4===1||beat%4===3)note(chord[[2,1,3,2][Math.floor(beat/2)%4]]+12,t+.15,.8,.045);beat++};
+  tick();timer=setInterval(tick,700);
 }
 async function enableSound(){
   try{audio??=new (window.AudioContext||window.webkitAudioContext)();if(!master){master=audio.createGain();master.gain.value=.48;master.connect(audio.destination)}await audio.resume();soundOn=true;startMusic();}catch{soundOn=false;}
@@ -43,12 +43,12 @@ function render(){
     if(current==='about'){const link=document.createElement('a');link.href='https://github.com/H-SeungWoo';link.textContent='GitHub · H-SeungWoo ↗';link.className='github-link';link.target='_blank';link.rel='noopener noreferrer';content.append(link)}
     const note=document.createElement('p');note.className='demo-note';note.textContent='IN THE MAKING · 상세한 이야기와 작업 기록을 준비하고 있습니다.';content.append(note);
     document.querySelector('#detail-title').focus({preventScroll:true});
-  }else{document.title='Personal Records — 나의 기록들'}
+  }else{document.title='Personal Records — The Listening Room'}
   window.scrollTo({top:0,behavior:'instant'});startMusic();updateSoundUI();
 }
 document.querySelectorAll('[data-track]').forEach(link=>link.addEventListener('click',()=>{if(!audio)enableSound()}));
 soundButton.addEventListener('click',()=>{if(soundOn){soundOn=false;stopMusic();updateSoundUI()}else enableSound()});
-document.querySelector('#back').addEventListener('click',()=>{const previous=current;location.hash='';setTimeout(()=>document.querySelector(`[data-track="${previous}"]`)?.focus(),0)});
+document.querySelector('#back').addEventListener('click',()=>{const previous=current;location.hash='';setTimeout(()=>document.querySelector(`[data-track="${previous}"]`)?.focus({preventScroll:true}),0)});
 document.querySelector('#next').addEventListener('click',()=>{location.hash=order[(order.indexOf(current)+1)%order.length]});
 window.addEventListener('hashchange',render);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stopMusic();else startMusic()});

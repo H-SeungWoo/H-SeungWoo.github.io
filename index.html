@@ -1,36 +1,30 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#eeece4">
-  <meta name="description" content="배움과 작업, 취향을 네 개의 트랙에 담은 레코드 포트폴리오.">
-  <title>Personal Records — 나의 기록들</title>
-  <link rel="stylesheet" href="./style.css">
-  <script src="./app.js" defer></script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#11110f"><meta name="description" content="H-SeungWoo의 배움, 작업, 취향을 담은 작은 리스닝 룸.">
+<title>Personal Records — The Listening Room</title>
+<link rel="stylesheet" href="./style.css?v=4"><script src="./app.js?v=4" defer></script><script type="module" src="./scene.js?v=4"></script>
 </head>
 <body>
-  <a class="skip" href="#main">본문으로 건너뛰기</a>
-  <header class="header">
-    <a class="brand" href="#" aria-label="Personal Records 홈"><span class="brand-mark">◎</span> PERSONAL RECORDS<span class="brand-dot">®</span></a>
-    <span class="header-note">A COLLECTION OF WHO I AM</span>
-    <button id="sound" class="sound" aria-pressed="false"><span class="sound-icon">♪</span><span id="sound-label">SOUND OFF</span></button>
-  </header>
-  <main id="main">
-    <section class="intro"><div class="eyebrow"><span class="dot"></span> THE PERSONAL COLLECTION · VOL. 01</div><h1>Every record<br>tells <em>a story.</em></h1><p>배우고, 만들고, 좋아하는 것들.<br>네 개의 트랙으로 들려주는 나의 이야기.</p></section>
-    <section class="collection" aria-label="포트폴리오 트랙 선택">
-      <div class="orbit" aria-hidden="true"></div>
-      <nav class="tracks" aria-label="포트폴리오 메뉴">
-        <a class="track track-one" href="#school" data-track="school"><span class="track-meta">SIDE A <span>01 / LEARNING</span></span><span class="track-title">전공과 학교생활 <span class="arrow">↗</span></span><span class="track-description">배움이 나의 언어가 되기까지</span><span class="track-bottom">Academic life <span>03:42</span></span></a>
-        <a class="track track-two" href="#projects" data-track="projects"><span class="track-meta">SIDE A <span>02 / MAKING</span></span><span class="track-title">프로젝트 <span class="arrow">↗</span></span><span class="track-description">생각을 손으로 옮긴 순간들</span><span class="track-bottom">Selected works <span>04:18</span></span></a>
-        <a class="track track-three" href="#inspiration" data-track="inspiration"><span class="track-meta">SIDE B <span>03 / COLLECTING</span></span><span class="track-title">취향과 영감 <span class="arrow">↗</span></span><span class="track-description">나를 움직이게 하는 작은 발견</span><span class="track-bottom">Things I love <span>02:56</span></span></a>
-        <a class="track track-four" href="#about" data-track="about"><span class="track-meta">SIDE B <span>04 / CONNECTING</span></span><span class="track-title">소개와 연락 <span class="arrow">↗</span></span><span class="track-description">그리고, 앞으로 이어질 이야기</span><span class="track-bottom">A little about me <span>03:24</span></span></a>
-      </nav>
-      <div class="record-position"><div class="record" id="record" aria-hidden="true"><div class="record-shine"></div><div class="record-label"><span class="label-top">PERSONAL RECORDS</span><span class="label-title">My own<br><i>little universe.</i></span><span class="spindle"></span><span class="label-bottom">STEREO &nbsp; • &nbsp; 33⅓ RPM<br>ORIGINAL COLLECTION / 001</span></div></div><span class="record-caption">A LIFE IN FOUR TRACKS</span></div>
-    </section>
-    <section id="detail" class="detail" hidden aria-labelledby="detail-title"><button id="back" class="back">← &nbsp; 전체 트랙으로</button><div class="detail-heading"><span id="detail-kicker" class="eyebrow"></span><h2 id="detail-title" tabindex="-1"></h2><p id="detail-description"></p></div><div id="detail-content"></div><button id="next" class="next-track">다음 트랙 <span>→</span></button></section>
-    <div class="listening-note" id="listening-note"><span class="small-record">◉</span> 트랙을 골라 나의 이야기를 재생해 보세요 <span class="note-line"></span><span class="note-en">PICK A TRACK. PRESS PLAY.</span></div>
-  </main>
-  <footer><span>© <span id="year"></span> PERSONAL RECORDS</span><span class="footer-center">MADE OF MOMENTS, PLAYED WITH FEELING.</span><span class="status"><span class="dot"></span><span id="play-status" aria-live="polite">READY TO PLAY</span></span></footer>
-</body>
-</html>
+<a class="skip" href="#main">본문으로 건너뛰기</a>
+<div class="room-light" aria-hidden="true"></div>
+<header class="header"><a class="brand" href="#" aria-label="Personal Records 홈"><span class="brand-mark">◉</span><span>PERSONAL<br>RECORDS<span class="brand-dot">®</span></span></a><span class="header-note">THE LISTENING ROOM &nbsp; / &nbsp; VOL. 001</span><button id="sound" class="sound" aria-pressed="false"><span class="sound-icon">▂ ▅ ▃ ▆</span><span id="sound-label">SOUND OFF</span></button></header>
+<main id="main">
+<section class="intro"><div class="eyebrow"><span class="dot"></span> A FEW THINGS THAT MAKE ME, ME.</div><h1>Life, in <em>rotation.</em></h1><p>배우고, 만들고, 좋아하는 것들.<br>나의 기록이 음악이 되는 작은 공간.</p></section>
+<section class="collection" aria-label="포트폴리오 트랙 선택">
+<div class="scene-frame" id="scene-frame"><div id="scene" role="img" aria-label="따뜻한 조명 아래 월넛 턴테이블과 회전하는 검은 레코드"></div><div class="fallback-record" aria-hidden="true"><div><span>PERSONAL<br><i>Records</i></span></div></div><span class="scene-caption"><span class="dot"></span> THE ORIGINAL PRESSING <button id="rotation" class="rotation-control" aria-pressed="true" aria-label="레코드 회전 일시정지">Ⅱ &nbsp; 33⅓ RPM</button></span></div>
+<nav class="tracks" aria-label="포트폴리오 메뉴">
+<a class="track track-one" href="#school" data-track="school"><span class="track-meta">SIDE A <span>01</span></span><span class="track-title">전공과 학교생활 <span class="arrow">↗</span></span><span class="track-description">Where curiosity begins</span><span class="track-bottom">배움이 나의 언어가 되기까지 <span>PLAY ↗</span></span></a>
+<a class="track track-two" href="#projects" data-track="projects"><span class="track-meta">SIDE A <span>02</span></span><span class="track-title">프로젝트 <span class="arrow">↗</span></span><span class="track-description">Ideas, made tangible</span><span class="track-bottom">생각을 손으로 옮긴 순간들 <span>PLAY ↗</span></span></a>
+<a class="track track-three" href="#inspiration" data-track="inspiration"><span class="track-meta">SIDE B <span>03</span></span><span class="track-title">취향과 영감 <span class="arrow">↗</span></span><span class="track-description">The things that stay</span><span class="track-bottom">나를 움직이는 작은 발견 <span>PLAY ↗</span></span></a>
+<a class="track track-four" href="#about" data-track="about"><span class="track-meta">SIDE B <span>04</span></span><span class="track-title">소개와 연락 <span class="arrow">↗</span></span><span class="track-description">A little closer to me</span><span class="track-bottom">앞으로 이어질 이야기 <span>PLAY ↗</span></span></a>
+</nav></section>
+<section id="detail" class="detail" hidden aria-labelledby="detail-title"><button id="back" class="back">← &nbsp; BACK TO THE COLLECTION</button><div class="detail-heading"><span id="detail-kicker" class="eyebrow"></span><h2 id="detail-title" tabindex="-1"></h2><p id="detail-description"></p></div><div id="detail-content"></div><button id="next" class="next-track">다음 트랙 <span>→</span></button></section>
+<div class="listening-note" id="listening-note"><span class="note-rule"></span><span>Take a moment. Pick a track.</span><span class="note-rule"></span><small>메뉴를 선택하면 음악과 함께 이야기가 시작됩니다.</small></div>
+</main>
+<footer><span>© <span id="year"></span> H-SEUNGWOO</span><span class="footer-center">GOOD THINGS TAKE A LITTLE LISTENING.</span><span class="status"><span class="dot"></span><span id="play-status" aria-live="polite">READY TO PLAY</span></span></footer>
+</body></html>
+
+
+
