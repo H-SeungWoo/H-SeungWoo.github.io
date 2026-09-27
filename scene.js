@@ -1,3 +1,4 @@
+import { motionReady } from './motion.js';
 // A compact, procedural Three.js turntable. No external model or texture files.
 const host = document.querySelector('#scene');
 try {
@@ -21,7 +22,7 @@ try {
   const env=new THREE.CanvasTexture(envCanvas);env.mapping=THREE.EquirectangularReflectionMapping;env.colorSpace=THREE.SRGBColorSpace;
   const pmrem=new THREE.PMREMGenerator(renderer);const envTarget=pmrem.fromEquirectangular(env);scene.environment=envTarget.texture;env.dispose();pmrem.dispose();
   const walnut=canvasTexture((ctx,s)=>{ctx.fillStyle='#3e2518';ctx.fillRect(0,0,s,s);let seed=41;const rand=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};for(let i=0;i<1800;i++){const y=rand()*s;ctx.strokeStyle=`rgba(${rand()>.5?'125,83,44':'12,8,5'},${.06+rand()*.2})`;ctx.lineWidth=.3+rand()*2.8;ctx.beginPath();for(let x=0;x<=s;x+=16){const yy=y+Math.sin(x*.009+y*.022)*3+Math.sin(x*.024+y)*1.2;x===0?ctx.moveTo(x,yy):ctx.lineTo(x,yy)}ctx.stroke()}});
-  const grooves=canvasTexture((ctx,s)=>{ctx.fillStyle='#747474';ctx.fillRect(0,0,s,s);for(let r=160;r<510;r+=1.8){const v=Math.round(90+32*Math.sin(r*2.6));ctx.strokeStyle=`rgb(${v},${v},${v})`;ctx.lineWidth=.7;ctx.beginPath();ctx.arc(s/2,s/2,r,0,Math.PI*2);ctx.stroke()}});grooves.colorSpace=THREE.NoColorSpace;
+  const grooves=canvasTexture((ctx,s)=>{ctx.fillStyle='#747474';ctx.fillRect(0,0,s,s);for(let r=160;r<510;r+=5){const v=Math.round(90+32*Math.sin(r*2.6));ctx.strokeStyle=`rgb(${v},${v},${v})`;ctx.lineWidth=.7;ctx.beginPath();ctx.arc(s/2,s/2,r,0,Math.PI*2);ctx.stroke()}});grooves.colorSpace=THREE.NoColorSpace;
   const label=canvasTexture((ctx,s)=>{ctx.fillStyle='#916a47';ctx.fillRect(0,0,s,s);ctx.strokeStyle='#30221955';ctx.lineWidth=3;for(const r of [450,430,150]){ctx.beginPath();ctx.arc(s/2,s/2,r,0,Math.PI*2);ctx.stroke()}ctx.fillStyle='#302218';ctx.textAlign='center';ctx.font='24px sans-serif';ctx.fillText('P E R S O N A L   R E C O R D S',512,220);ctx.font='italic 86px Georgia';ctx.fillText('After hours.',512,365);ctx.font='23px sans-serif';ctx.fillText('H - S E U N G W O O',512,425);ctx.font='21px sans-serif';ctx.fillText('SIDE A     •     STEREO',512,705);ctx.font='17px sans-serif';ctx.fillText('THE ORIGINAL COLLECTION / 001',512,760);ctx.font='34px Georgia';ctx.fillText('33⅓',512,835)});
   const black=new THREE.MeshStandardMaterial({color:0x101210,roughness:.45,metalness:.25});
   const silver=new THREE.MeshStandardMaterial({color:0xb0aba0,metalness:.95,roughness:.23});
@@ -40,7 +41,7 @@ try {
   // Platter strobe marks catch the light along the silver rim.
   const dotGeo=new THREE.BoxGeometry(.035,.035,.025);const marks=new THREE.InstancedMesh(dotGeo,silver,140);const transform=new THREE.Object3D();for(let i=0;i<140;i++){const a=i/140*Math.PI*2;transform.position.set(-.52+Math.cos(a)*1.866,.725,Math.sin(a)*1.866);transform.rotation.y=-a;transform.updateMatrix();marks.setMatrixAt(i,transform.matrix)}rig.add(marks);
   const vinyl=new THREE.Group();vinyl.position.set(-.52,.87,0);rig.add(vinyl);
-  const vinylMat=new THREE.MeshPhysicalMaterial({color:0x050606,metalness:.38,roughness:.24,clearcoat:.35,clearcoatRoughness:.18,bumpMap:grooves,bumpScale:.018,envMapIntensity:.7});
+  const vinylMat=new THREE.MeshPhysicalMaterial({color:0x050606,metalness:.38,roughness:.24,clearcoat:.35,clearcoatRoughness:.18,bumpMap:grooves,bumpScale:.008,envMapIntensity:.7});
   cylinder(1.77,.035,black,0,0,0,vinyl);
   const surface=mesh(new THREE.CircleGeometry(1.765,160),vinylMat,vinyl);surface.rotation.x=-Math.PI/2;surface.position.y=.02;
   // Sparse, subdued rings remain readable at lower pixel density.
@@ -66,8 +67,8 @@ try {
   const rim=new THREE.DirectionalLight(0xb3c5ca,1.4);rim.position.set(4,3,-3);scene.add(rim);
   const warm=new THREE.PointLight(0xe7a864,7,12,2);warm.position.set(-4,1.8,-2);scene.add(warm);
   let rotating=true;
-  let width=1,height=1,active=false,hover=0,targetHover=0,angle=0,velocity=.2,last=0,raf=0,disposed=false;
-  const look=new THREE.Vector3(), target=new THREE.Vector3();
+  let width=1,height=1,active=false,hover=0,targetHover=0,angle=0,velocity=3.49,last=0,raf=0,disposed=false;
+  const look=new THREE.Vector3(), target=new THREE.Vector3(); const cameraIntro={progress:reduced.matches?1:0}; let introAnimation; camera.up.set(0,0,-1);
   function resize(){const rect=host.getBoundingClientRect();width=rect.width;height=rect.height;if(!width||!height)return;renderer.setSize(width,height,false);camera.aspect=width/height;camera.updateProjectionMatrix();if(reduced.matches)draw(performance.now())}
   const observer=new ResizeObserver(resize);observer.observe(host);
   function state(){active=['#school','#projects','#inspiration','#about'].includes(location.hash);if(reduced.matches)draw(performance.now())}
@@ -77,20 +78,22 @@ try {
   if(reduced.matches)rotationButton.hidden=true;
   reduced.addEventListener('change',()=>rotationButton.hidden=reduced.matches);
   document.querySelectorAll('[data-track]').forEach((el,index)=>{el.addEventListener('pointerenter',()=>targetHover=(index%2?1:-1));el.addEventListener('pointerleave',()=>targetHover=0)});
-  function draw(time){if(disposed)return;const dt=Math.min((time-last)/1000||.016,.05);last=time;const narrow=matchMedia('(max-width:650px)').matches;
-    const blend=reduced.matches?1:1-Math.exp(-dt*3);velocity+=( (active?3.49:.2)-velocity)*blend;
+  function draw(time){if(disposed)return;const dt=Math.min((time-last)/1000||.016,.05);last=time;const narrow=matchMedia('(max-width:900px)').matches;
+    const blend=reduced.matches?1:1-Math.exp(-dt*3);velocity=3.49;
     if(!reduced.matches&&rotating)angle+=dt*velocity;vinyl.rotation.y=-angle;
     hover+=(targetHover-hover)*blend;
-    target.set(active?.35:0,active?6.9:7.6,active?6.9:8.6);
+    const p=reduced.matches?1:cameraIntro.progress;
+    target.set(0,THREE.MathUtils.lerp(7.6,10.4,p),THREE.MathUtils.lerp(8.6,0,p));
     if(narrow)target.multiplyScalar(1.07);
-    camera.position.lerp(target,blend);look.set(active?-.15:0,.4,0);camera.lookAt(look);
-    rig.rotation.y=-.18+(reduced.matches?0:hover*.028);arm.rotation.y=THREE.MathUtils.lerp(arm.rotation.y,active?-.37:0,blend);
-    renderer.render(scene,camera);
+    camera.position.copy(target);look.set(0,.4,0);camera.lookAt(look);
+    rig.rotation.y=THREE.MathUtils.lerp(-.18,0,p);arm.rotation.y=-.37;
+    if(!document.body.classList.contains('detail-mode'))renderer.render(scene,camera);
     if(!reduced.matches&&!document.hidden)raf=requestAnimationFrame(draw);
   }
   camera.position.set(0,7.6,8.6);resize();draw(performance.now());document.body.classList.add('scene-ready');
+  motionReady.then(motion=>{if(reduced.matches||active||!motion){cameraIntro.progress=1;return}introAnimation=motion.animate(cameraIntro,{progress:1,delay:400,duration:2600,ease:'inOutCubic',onComplete:()=>{document.body.dataset.cameraView='top'}})});
   document.addEventListener('visibilitychange',()=>{cancelAnimationFrame(raf);if(!document.hidden){last=performance.now();draw(last)}});
-  reduced.addEventListener('change',()=>{cancelAnimationFrame(raf);draw(performance.now())});
+  reduced.addEventListener('change',()=>{introAnimation?.pause();cameraIntro.progress=1;cancelAnimationFrame(raf);draw(performance.now())});
   renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();cancelAnimationFrame(raf);document.body.classList.remove('scene-ready');document.body.classList.add('scene-failed')});
   renderer.domElement.addEventListener('webglcontextrestored',()=>{document.body.classList.add('scene-ready');document.body.classList.remove('scene-failed');draw(performance.now())});
   window.addEventListener('pagehide',()=>{cancelAnimationFrame(raf)});
@@ -99,6 +102,9 @@ try {
   document.body.classList.add('scene-failed');
   console.warn('3D scene unavailable; showing the static record.',error);
 }
+
+
+
 
 
 

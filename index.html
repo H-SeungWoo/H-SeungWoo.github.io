@@ -4,7 +4,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#11110f"><meta name="description" content="H-SeungWoo의 배움, 작업, 취향을 담은 작은 리스닝 룸.">
 <title>Personal Records — The Listening Room</title>
-<link rel="stylesheet" href="./style.css?v=4"><script src="./app.js?v=4" defer></script><script type="module" src="./scene.js?v=4"></script>
+<link rel="stylesheet" href="./style.css?v=6"><script type="module" src="./app.js?v=6"></script><script type="module" src="./scene.js?v=6"></script>
 </head>
 <body>
 <a class="skip" href="#main">본문으로 건너뛰기</a>
@@ -20,11 +20,13 @@
 <a class="track track-three" href="#inspiration" data-track="inspiration"><span class="track-meta">SIDE B <span>03</span></span><span class="track-title">취향과 영감 <span class="arrow">↗</span></span><span class="track-description">The things that stay</span><span class="track-bottom">나를 움직이는 작은 발견 <span>PLAY ↗</span></span></a>
 <a class="track track-four" href="#about" data-track="about"><span class="track-meta">SIDE B <span>04</span></span><span class="track-title">소개와 연락 <span class="arrow">↗</span></span><span class="track-description">A little closer to me</span><span class="track-bottom">앞으로 이어질 이야기 <span>PLAY ↗</span></span></a>
 </nav></section>
-<section id="detail" class="detail" hidden aria-labelledby="detail-title"><button id="back" class="back">← &nbsp; BACK TO THE COLLECTION</button><div class="detail-heading"><span id="detail-kicker" class="eyebrow"></span><h2 id="detail-title" tabindex="-1"></h2><p id="detail-description"></p></div><div id="detail-content"></div><button id="next" class="next-track">다음 트랙 <span>→</span></button></section>
-<div class="listening-note" id="listening-note"><span class="note-rule"></span><span>Take a moment. Pick a track.</span><span class="note-rule"></span><small>메뉴를 선택하면 음악과 함께 이야기가 시작됩니다.</small></div>
+<section id="detail" class="detail" hidden aria-labelledby="detail-title"><button id="back" class="back">← &nbsp; BACK TO THE COLLECTION</button><nav class="chapter-nav" aria-label="다른 트랙"><a href="#school" data-track="school">01 학업</a><a href="#projects" data-track="projects">02 프로젝트</a><a href="#inspiration" data-track="inspiration">03 취향</a><a href="#about" data-track="about">04 소개</a></nav><div class="detail-heading"><span id="detail-number" aria-hidden="true"></span><span id="detail-kicker" class="eyebrow"></span><h2 id="detail-title" tabindex="-1"></h2><p id="detail-description"></p></div><div id="detail-content"></div><button id="next" class="next-track">다음 트랙 <span>→</span></button></section>
+<div class="listening-note" id="listening-note"><span class="note-rule"></span><span>Take a moment. Pick a track.</span><span class="note-rule"></span><small>음악은 계속 흐르고, 이야기는 다음 트랙으로 이어집니다.</small></div>
 </main>
-<footer><span>© <span id="year"></span> H-SEUNGWOO</span><span class="footer-center">GOOD THINGS TAKE A LITTLE LISTENING.</span><span class="status"><span class="dot"></span><span id="play-status" aria-live="polite">READY TO PLAY</span></span></footer>
-</body></html>
+<footer><span>© <span id="year"></span> H-SEUNGWOO</span><span class="footer-center">GOOD THINGS TAKE A LITTLE LISTENING.</span><span id="current-section">THE COLLECTION</span></footer>
+<aside class="session-player" aria-label="배경음악 재생 상태"><span class="mini-vinyl" aria-hidden="true">◉</span><div><span id="play-status" aria-live="polite">AFTER HOURS · READY</span><small id="audio-hint">첫 클릭이나 터치로 음악을 시작하세요.</small></div><span class="session-line"></span><time id="elapsed">00:00</time><span class="session-caption">ONE CONTINUOUS SESSION</span></aside></body></html>
+
+
 
 
 
