@@ -2,6 +2,7 @@ import { albums } from './albums.js';
 import { motionReady } from './motion.js';
 // A compact, procedural Three.js turntable. No external model or texture files.
 const host = document.querySelector('#scene');
+function revealInterface(){document.body.dataset.entrance='ready';document.body.dataset.cameraView='top'}
 try {
   const THREE = await import('https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
@@ -95,15 +96,15 @@ try {
     if(!reduced.matches&&!document.hidden)raf=requestAnimationFrame(draw);
   }
   camera.position.set(0,7.6,8.6);resize();draw(performance.now());document.body.classList.add('scene-ready');
-  motionReady.then(motion=>{if(reduced.matches||active||!motion){cameraIntro.progress=1;return}introAnimation=motion.animate(cameraIntro,{progress:1,delay:400,duration:2600,ease:'inOutCubic',onComplete:()=>{document.body.dataset.cameraView='top'}})});
+  motionReady.then(motion=>{if(reduced.matches||active||!motion){cameraIntro.progress=1;cancelAnimationFrame(raf);draw(performance.now());revealInterface();return}introAnimation=motion.animate(cameraIntro,{progress:1,delay:400,duration:2600,ease:'inOutCubic',onComplete:revealInterface})});
   document.addEventListener('visibilitychange',()=>{cancelAnimationFrame(raf);if(!document.hidden){last=performance.now();draw(last)}});
-  reduced.addEventListener('change',()=>{introAnimation?.pause();cameraIntro.progress=1;cancelAnimationFrame(raf);draw(performance.now())});
-  renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();cancelAnimationFrame(raf);document.body.classList.remove('scene-ready');document.body.classList.add('scene-failed')});
+  reduced.addEventListener('change',()=>{introAnimation?.pause();cameraIntro.progress=1;cancelAnimationFrame(raf);draw(performance.now());revealInterface()});
+  renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();cancelAnimationFrame(raf);document.body.classList.remove('scene-ready');document.body.classList.add('scene-failed');revealInterface()});
   renderer.domElement.addEventListener('webglcontextrestored',()=>{document.body.classList.add('scene-ready');document.body.classList.remove('scene-failed');draw(performance.now())});
   window.addEventListener('pagehide',()=>{cancelAnimationFrame(raf)});
   window.addEventListener('pageshow',event=>{if(event.persisted){last=performance.now();draw(last)}});
 } catch(error) {
-  document.body.classList.add('scene-failed');
+  document.body.classList.add('scene-failed');revealInterface();
   console.warn('3D scene unavailable; showing the static record.',error);
 }
 
