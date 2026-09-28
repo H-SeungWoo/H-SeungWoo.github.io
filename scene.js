@@ -1,3 +1,4 @@
+import { albums } from './albums.js';
 import { motionReady } from './motion.js';
 // A compact, procedural Three.js turntable. No external model or texture files.
 const host = document.querySelector('#scene');
@@ -66,17 +67,20 @@ try {
   const key=new THREE.SpotLight(0xffd29a,48,25,Math.PI/5,.75,1.5);key.position.set(-3,7,-3);key.target.position.set(-.6,0,0);key.castShadow=true;key.shadow.mapSize.set(1024,1024);key.shadow.bias=-.0003;key.shadow.normalBias=.035;scene.add(key,key.target);
   const rim=new THREE.DirectionalLight(0xb3c5ca,1.4);rim.position.set(4,3,-3);scene.add(rim);
   const warm=new THREE.PointLight(0xe7a864,7,12,2);warm.position.set(-4,1.8,-2);scene.add(warm);
-  let rotating=true;
+  let rotating=document.body.classList.contains('record-playing');
   let width=1,height=1,active=false,hover=0,targetHover=0,angle=0,velocity=3.49,last=0,raf=0,disposed=false;
   const look=new THREE.Vector3(), target=new THREE.Vector3(); const cameraIntro={progress:reduced.matches?1:0}; let introAnimation; camera.up.set(0,0,-1);
   function resize(){const rect=host.getBoundingClientRect();width=rect.width;height=rect.height;if(!width||!height)return;renderer.setSize(width,height,false);camera.aspect=width/height;camera.updateProjectionMatrix();if(reduced.matches)draw(performance.now())}
   const observer=new ResizeObserver(resize);observer.observe(host);
-  function state(){active=['#school','#projects','#inspiration','#about'].includes(location.hash);if(reduced.matches)draw(performance.now())}
+  function state(){active=albums.some(a=>'#'+a.id===location.hash);if(reduced.matches)draw(performance.now())}
   window.addEventListener('hashchange',state);state();
   const rotationButton=document.querySelector('#rotation');
-  rotationButton.addEventListener('click',()=>{rotating=!rotating;rotationButton.setAttribute('aria-pressed',String(rotating));rotationButton.setAttribute('aria-label',rotating?'레코드 회전 일시정지':'레코드 회전 재개');rotationButton.textContent=rotating?'Ⅱ  33⅓ RPM':'▶  RESUME'});
-  if(reduced.matches)rotationButton.hidden=true;
-  reduced.addEventListener('change',()=>rotationButton.hidden=reduced.matches);
+  function play(){rotating=true;document.body.classList.add('record-playing');rotationButton.setAttribute('aria-pressed','true');rotationButton.textContent='Ⅱ  33⅓ RPM';rotationButton.setAttribute('aria-label','레코드 회전 일시정지')}
+  document.addEventListener('record-play',play);
+  document.addEventListener('record-pause',()=>rotating=false);
+  function albumLabel(album){const ctx=label.image.getContext('2d');ctx.fillStyle=album.color;ctx.fillRect(0,0,1024,1024);ctx.fillStyle='#231c17';ctx.textAlign='center';ctx.font='26px sans-serif';ctx.fillText('P E R S O N A L   R E C O R D S',512,230);ctx.font='italic 80px Georgia';album.cover.split('\n').forEach((line,i)=>ctx.fillText(line,512,355+i*95));ctx.font='30px sans-serif';ctx.fillText(album.title,512,680);ctx.font='24px sans-serif';ctx.fillText(album.era,512,745);ctx.fillText('No. '+album.number+'     /     33⅓ RPM',512,825);label.needsUpdate=true;if(reduced.matches)draw(performance.now())}
+  document.addEventListener('album-change',event=>{albumLabel(event.detail);motionReady.then(m=>{if(m&&!reduced.matches)m.animate(vinyl.position,{y:[1.9,.87],duration:850,ease:'outCubic'})})});
+  albumLabel(albums.find(a=>a.id===document.body.dataset.album)||albums[0]);
   document.querySelectorAll('[data-track]').forEach((el,index)=>{el.addEventListener('pointerenter',()=>targetHover=(index%2?1:-1));el.addEventListener('pointerleave',()=>targetHover=0)});
   function draw(time){if(disposed)return;const dt=Math.min((time-last)/1000||.016,.05);last=time;const narrow=matchMedia('(max-width:900px)').matches;
     const blend=reduced.matches?1:1-Math.exp(-dt*3);velocity=3.49;

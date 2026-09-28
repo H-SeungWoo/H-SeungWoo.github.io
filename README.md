@@ -35,3 +35,11 @@ Three.js는 버전이 고정된 jsDelivr CDN에서 불러오며 글꼴은 Google
 
 기존 저장소 `main` 브랜치의 GitHub Pages 자동 배포를 사용합니다. 사이트 파일과 README 변경을 저장소에 반영하면 `pages build and deployment`가 실행됩니다. 파일 경로는 상대 경로입니다. 변경 시 index.html의 리소스 버전 쿼리도 갱신해 브라우저 캐시를 방지하세요.
 
+
+## LP collection (2026-09)
+- Five albums live in `albums.js`: identity, campus, Unreal/Blender, web, AI.
+- Add an album to that array to extend the three-column cabinet; its fixed slot is empty while selected.
+- Each `entries` item is a slide: `[small label, title, body]`. The UI supports arrow buttons, left/right keys, and mouse wheel.
+- Shelf: labeled left-side handle; native modal dialog, Escape, outside click, focus return; walnut cabinet and brass plaques.
+- Initial record is stationary. PLAY RECORD or choosing another LP starts rotation and requests audio. Album navigation never recreates the soundtrack.
+- Reduced motion keeps the camera in its top view and removes animated transitions. Content remains accessible without Three.js.

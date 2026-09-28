@@ -2,7 +2,7 @@
 export function setupSoundtrack(){
   const button=document.querySelector('#sound'),label=document.querySelector('#sound-label');
   const status=document.querySelector('#play-status'),elapsed=document.querySelector('#elapsed'),hint=document.querySelector('#audio-hint');
-  let context,master,buffer,source,startedAt=0,muted=false,wanted=true;
+  let context,master,buffer,source,startedAt=0,muted=false,wanted=false;
   const duration=22.4;
   function paint(){const playing=!!source&&context?.state==='running'&&!muted;
     button.setAttribute('aria-pressed',String(playing));label.textContent=playing?'SOUND ON':muted?'SOUND OFF':'ENABLE SOUND';
@@ -10,7 +10,7 @@ export function setupSoundtrack(){
     hint.hidden=playing||muted;document.body.classList.toggle('music-playing',playing);
     if(source){const total=Math.floor(context.currentTime-startedAt);elapsed.textContent=`${String(Math.floor(total/60)).padStart(2,'0')}:${String(total%60).padStart(2,'0')}`}
   }
-  function start(){if(buffer&&context?.state==='running'&&!source){source=context.createBufferSource();source.buffer=buffer;source.loop=true;source.connect(master);startedAt=context.currentTime;source.start();}paint()}
+  function start(){if(wanted&&buffer&&context?.state==='running'&&!source){source=context.createBufferSource();source.buffer=buffer;source.loop=true;source.connect(master);startedAt=context.currentTime;source.start();}paint()}
   async function prepare(){
     try{
       const Ctx=window.AudioContext||window.webkitAudioContext;context=new Ctx();master=context.createGain();master.gain.value=.43;master.connect(context.destination);context.addEventListener('statechange',start);
@@ -22,8 +22,7 @@ export function setupSoundtrack(){
       buffer=await offline.startRendering();start();if(wanted)context.resume().then(start).catch(paint);
     }catch(error){label.textContent='SOUND UNAVAILABLE';hint.textContent='이 브라우저에서는 오디오를 사용할 수 없습니다.';console.warn('Audio unavailable',error)}
   }
-  function unlock(event){if(event?.target?.closest('#sound')||!wanted||muted)return;context?.resume().then(start).catch(paint)}
-  document.addEventListener('pointerdown',unlock,{passive:true});document.addEventListener('keydown',unlock);
+  document.addEventListener('record-play',()=>{wanted=true;context?.resume().then(start).catch(paint)});
   button.addEventListener('click',()=>{if(!context)return;if(source&&context.state==='running'&&!muted){muted=true;wanted=false;master.gain.setTargetAtTime(0,context.currentTime,.06)}else{muted=false;wanted=true;master.gain.setTargetAtTime(.43,context.currentTime,.06);context.resume().then(start).catch(paint)}paint()});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)paint()});setInterval(paint,1000);prepare();paint();
 }

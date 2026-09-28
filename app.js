@@ -1,67 +1,36 @@
+import { albums } from './albums.js';
 import { motionReady, reducedMotion } from './motion.js';
 import { setupSoundtrack } from './audio.js';
-// 이 네 개의 트랙 내용을 나의 실제 이야기로 바꿔 주세요.
-const tracks = {
-  school: { number:'01', side:'A', title:'전공과 학교생활', subtitle:'배움이 나의 언어가 되기까지.', notes:[60,64,67,71], entries:[['MY MAJOR','ICT융합학부 · 미디어 테크놀로지전공','ICT융합학부 미디어 테크놀로지전공. 전공을 선택한 계기와 관심 있게 탐구하는 주제는 곧 이곳에 기록할 예정입니다.'],['ON CAMPUS','강의실 밖에서도 계속되는 배움','기억에 남는 수업, 동아리 활동, 함께한 사람들과의 경험을 담는 공간입니다.'],['LOOKING BACK','배우고, 다시 질문하고','학교생활을 통해 달라진 생각과 앞으로 더 탐구하고 싶은 주제를 소개해 주세요.']] },
-  projects: { number:'02', side:'A', title:'프로젝트', subtitle:'머릿속의 가능성이 실제로 작동하는 무언가가 되는 과정.', notes:[57,60,64,67], entries:[['PROJECT 01','나의 첫 번째 프로젝트','프로젝트 이름과 해결하고 싶었던 문제를 적어 주세요. 담당 역할, 선택한 방법, 결과와 배운 점으로 이야기를 이어갈 수 있습니다.'],['PROJECT 02','함께 만들어 낸 결과','팀 프로젝트에서 나의 역할과 협업 과정, 가장 어려웠던 문제와 해결 경험을 소개해 주세요.'],['WORK IN PROGRESS','지금 만들고 있는 것','진행 중인 작은 실험이나 앞으로 시도하고 싶은 작업을 소개해 주세요.']] },
-  inspiration: { number:'03', side:'B', title:'취향과 영감', subtitle:'무심코 지나칠 수 없는 것들이 모여 나를 만듭니다.', notes:[62,65,69,72], entries:[['ON REPEAT','자꾸 다시 듣게 되는 음악','좋아하는 음악과 그 음악에 얽힌 기억을 소개해 주세요. 나만의 플레이리스트 링크를 더해도 좋습니다.'],['IN MY FRAME','일상에서 수집하는 장면','사진, 책, 영화, 공간처럼 나에게 새로운 시선을 주는 것들을 기록하는 공간입니다.'],['OFF THE RECORD','일 밖의 나','꾸준히 즐기는 취미와 일상의 작은 습관들을 소개해 주세요.']] },
-  about: { number:'04', side:'B', title:'소개와 연락', subtitle:'좋은 이야기는 새로운 만남에서 시작되니까요.', notes:[55,59,62,67], entries:[['HELLO, I AM','안녕하세요, H-SeungWoo입니다.','나를 표현하는 짧은 소개를 적어 주세요. 어떤 일을 좋아하고, 어떤 방향으로 성장하고 싶은지 들려주세요.'],['MY APPROACH','나만의 속도로, 꾸준하게','일을 대하는 태도와 중요하게 생각하는 가치, 함께 일할 때의 강점을 소개해 주세요.'],['LET’S CONNECT','다음 이야기를 함께 만들어요','이곳에 공개할 이메일과 GitHub, 소셜 링크를 넣어 주세요. 연락처를 설정하기 전까지는 개인 정보가 표시되지 않습니다.']] }
-};
+let selected=albums[0],slide=0,motion,changing=false;
+const $=s=>document.querySelector(s),shelf=$('#shelf'),detail=$('#detail');
+motionReady.then(m=>motion=m);
+function paintRotation(playing){document.body.classList.toggle('record-playing',playing);$('#rotation').setAttribute('aria-pressed',String(playing));$('#rotation').setAttribute('aria-label',playing?'레코드 회전 일시정지':'레코드 재생');$('#rotation').textContent=playing?'Ⅱ  33⅓ RPM':'▶  PLAY RECORD'}
+document.addEventListener('record-play',()=>paintRotation(true));
+$('#rotation').addEventListener('click',()=>{if(document.body.classList.contains('record-playing')){paintRotation(false);document.dispatchEvent(new Event('record-pause'))}else document.dispatchEvent(new Event('record-play'))});
+$('#shelf-open small').textContent=`${albums.length} RECORDS`;
 
-const order=Object.keys(tracks), detail=document.querySelector('#detail');
-let current=null, desired=null, routing=false, initialized=false;
-let anime=null;motionReady.then(value=>{anime=value});
-const homeElements=[document.querySelector('.intro'),document.querySelector('.collection'),document.querySelector('.listening-note')];
-function animate(targets,parameters){return new Promise(resolve=>{if(!anime||reducedMotion.matches){resolve();return}anime.animate(targets,{...parameters,onComplete:resolve})})}
-function populate(){
-  document.body.classList.toggle('detail-mode',!!current);detail.hidden=!current;
-  document.querySelector('.intro').inert=!!current;document.querySelector('.tracks').inert=!!current;
-  document.querySelectorAll('[data-track]').forEach(link=>{if(link.dataset.track===current)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current')});
-  document.querySelector('#current-section').textContent=current?tracks[current].title:'THE COLLECTION';
-  if(!current){document.title='Personal Records — The Listening Room';return}
-  const data=tracks[current];detail.dataset.category=current;document.title=`${data.title} — Personal Records`;
-  document.querySelector('#detail-kicker').textContent=`THE LINER NOTES / SIDE ${data.side}`;
-  document.querySelector('#detail-number').textContent=data.number;
-  document.querySelector('#detail-title').textContent=data.title;
-  document.querySelector('#detail-description').textContent=data.subtitle;
-  const content=document.querySelector('#detail-content');content.replaceChildren();
-  data.entries.forEach(([tag,title,copy],index)=>{
-    const entry=document.createElement('article');entry.className='detail-entry';
-    const count=document.createElement('span');count.className='entry-index';count.textContent=String(index+1).padStart(2,'0');entry.append(count);
-    const body=document.createElement('div');body.className='entry-body';
-    if(current==='projects'||current==='inspiration'){const art=document.createElement('div');art.className='entry-art';art.setAttribute('aria-label','이미지와 작업 기록을 위한 공간');const artTitle=document.createElement('span');artTitle.textContent=current==='projects'?['MAKE.','EXPLORE.','REPEAT.'][index]:['Listen.','Observe.','Collect.'][index];const small=document.createElement('small');small.textContent='A SPACE FOR THE NEXT STORY';art.append(artTitle,small);body.append(art)}
-    for(const [element,text,cls] of [['span',tag,'entry-number'],['h3',title,''],['p',copy,'']]){const el=document.createElement(element);el.textContent=text;el.className=cls;body.append(el)}entry.append(body);content.append(entry);
-  });
-  if(current==='about'){const link=document.createElement('a');link.href='https://github.com/H-SeungWoo';link.textContent='GitHub · H-SeungWoo ↗';link.className='github-link';link.target='_blank';link.rel='noopener noreferrer';content.append(link)}
-  const note=document.createElement('p');note.className='demo-note';note.textContent='IN THE MAKING — 이 속지는 앞으로의 이야기로 채워집니다.';content.append(note);
-  document.querySelector('#next').firstChild.textContent=`다음 트랙 · ${tracks[order[(order.indexOf(current)+1)%order.length]].title} `;
+function animate(el,options){if(!motion||reducedMotion.matches)return Promise.resolve();return new Promise(resolve=>motion.animate(el,{...options,onComplete:resolve}))}
+function cabinet(){
+ $('#cabinet').replaceChildren();
+ albums.forEach(album=>{
+  const slot=document.createElement('div');slot.className='cubby';slot.dataset.album=album.id;
+  const button=document.createElement('button');button.className='record-slot';button.disabled=album===selected;button.setAttribute('aria-label',`${album.title} · ${album.era}${album===selected?' · 현재 선택한 LP':' 선택'}`);
+  if(album===selected){button.innerHTML='<span class="empty-ring" aria-hidden="true"></span><span class="on-turntable">ON THE<br>TURNTABLE</span>';slot.classList.add('is-empty')}
+  else{const cover=document.createElement('span');cover.className='album-cover';cover.style.setProperty('--cover',album.color);const n=document.createElement('small');n.textContent=`PERSONAL RECORDS / ${album.number}`;const title=document.createElement('strong');title.textContent=album.cover;const sub=document.createElement('span');sub.textContent=album.tag;cover.append(n,title,sub);button.append(cover)}
+  const plaque=document.createElement('div');plaque.className='plaque';const name=document.createElement('strong');name.textContent=album.title;const era=document.createElement('small');era.textContent=album.era;plaque.append(name,era);if(album.id==='campus'){const note=document.createElement('small');note.textContent='ICT융합학부 및 학부연구생';plaque.append(note)}
+  button.addEventListener('click',()=>selectAlbum(album,button));slot.append(button,plaque);$('#cabinet').append(slot);
+ });
+ for(let i=0;i<(3-albums.length%3)%3;i++){const blank=document.createElement('div');blank.className='cubby future-slot';blank.innerHTML='<span>TO BE CONTINUED</span>';$('#cabinet').append(blank)}
 }
-function cleanMotion(){for(const el of [...homeElements,detail,...document.querySelectorAll('.detail-heading,.detail-entry')]){el.style.removeProperty('opacity');el.style.removeProperty('transform');el.style.removeProperty('translate');el.style.removeProperty('scale')}}
-async function route(){
-  desired=tracks[location.hash.slice(1)]?location.hash.slice(1):null;
-  if(routing)return;routing=true;
-  try{
-    if(!initialized){current=desired;populate();initialized=true;if(current)document.querySelector('#detail-title').focus({preventScroll:true})}
-    while(current!==desired){
-      const previous=current;
-      await animate(current?detail:homeElements,{opacity:[1,0],duration:180,ease:'inQuad'});
-      current=desired;populate();window.scrollTo({top:0,behavior:'instant'});cleanMotion();
-      if(current){
-        document.querySelector('#detail-title').focus({preventScroll:true});
-        if(anime&&!reducedMotion.matches){anime.animate('.detail-heading,.detail-entry',{opacity:[0,1],y:[22,0],delay:anime.stagger(50,{start:90}),duration:350,ease:'outCubic'})}
-        await animate(detail,{opacity:[0,1],y:[64,0],scale:[.985,1],duration:620,ease:'outCubic'});
-      }else{
-        await animate(homeElements,{opacity:[0,1],duration:350,ease:'outQuad'});
-        document.querySelector(`.tracks [data-track="${previous}"]`)?.focus({preventScroll:true});
-      }
-      cleanMotion();
-    }
-  }finally{routing=false}
-}
-window.addEventListener('hashchange',route);
-document.querySelector('#back').addEventListener('click',()=>{location.hash=''});
-document.querySelector('#next').addEventListener('click',()=>{location.hash=order[(order.indexOf(current)+1)%order.length]});
-document.querySelector('#year').textContent=new Date().getFullYear();
-document.querySelector('.skip').addEventListener('click',event=>{event.preventDefault();const main=document.querySelector('#main');main.setAttribute('tabindex','-1');main.focus()});
-route();setupSoundtrack();
-
+function updateAlbum(){document.body.dataset.album=selected.id;$('#album-title').textContent=selected.title;$('#album-number').textContent=selected.number;$('#album-subtitle').textContent=selected.english;$('#album-detail').href=`#${selected.id}`;$('#current-section').textContent=`${selected.number} / ${selected.title}`;cabinet();document.dispatchEvent(new CustomEvent('album-change',{detail:selected}))}
+async function closeShelf(){if(!shelf.open)return;await animate(shelf,{x:[0,-45],opacity:[1,0],duration:220,ease:'inQuad'});shelf.close();shelf.style.removeProperty('transform');shelf.style.removeProperty('opacity');document.body.classList.remove('shelf-open');$('#shelf-open').setAttribute('aria-expanded','false');$('#shelf-open').focus()}
+$('#shelf-open').addEventListener('click',()=>{cabinet();shelf.showModal();document.body.classList.add('shelf-open');$('#shelf-open').setAttribute('aria-expanded','true');animate(shelf,{x:['-100%',0],opacity:[.5,1],duration:520,ease:'outCubic'});$('#shelf-close').focus()});
+$('#shelf-close').addEventListener('click',closeShelf);shelf.addEventListener('cancel',e=>{e.preventDefault();closeShelf()});shelf.addEventListener('click',e=>{if(e.target===shelf){const r=shelf.getBoundingClientRect();if(e.clientX>r.right||e.clientY>r.bottom||e.clientX<r.left||e.clientY<r.top)closeShelf()}});
+async function selectAlbum(album,button){if(changing)return;changing=true;document.dispatchEvent(new Event('record-play'));await animate(button,{y:[0,-12],scale:[1,1.04],opacity:[1,0],duration:240,ease:'inQuad'});selected=album;updateAlbum();await closeShelf();changing=false;$('#album-detail').focus({preventScroll:true})}
+function renderSlide(){const [tag,title,copy]=selected.entries[slide];$('#detail-kicker').textContent=`${selected.number} / ${selected.title} · ${selected.era}`;$('#detail-number').textContent=String(slide+1).padStart(2,'0');$('#detail-title').textContent=title;$('#detail-description').textContent=tag;$('#detail-content').replaceChildren();const p=document.createElement('p');p.className='slide-copy';p.textContent=copy;$('#detail-content').append(p);if(selected.id==='about'&&slide===2){const link=document.createElement('a');link.className='github-link';link.href='https://github.com/H-SeungWoo';link.target='_blank';link.rel='noopener noreferrer';link.textContent='GitHub · H-SeungWoo ↗';$('#detail-content').append(link)}$('#slide-count').textContent=`${String(slide+1).padStart(2,'0')} / ${String(selected.entries.length).padStart(2,'0')}`;$('#previous').disabled=slide===0;$('#next').disabled=slide===selected.entries.length-1}
+async function step(direction){if(changing||detail.hidden)return;const next=slide+direction;if(next<0||next>=selected.entries.length)return;changing=true;await animate([$('.detail-heading'),$('#detail-content')],{opacity:[1,0],x:[0,-direction*24],duration:160,ease:'inQuad'});slide=next;renderSlide();await animate([$('.detail-heading'),$('#detail-content')],{opacity:[0,1],x:[direction*32,0],duration:360,ease:'outCubic'});changing=false}
+function route(){const album=albums.find(a=>a.id===location.hash.slice(1));if(album){if(selected!==album){selected=album;updateAlbum()}slide=0;renderSlide()}detail.hidden=!album;document.body.classList.toggle('detail-mode',!!album);$('.collection').inert=!!album;$('#shelf-open').hidden=!!album;document.title=album?`${album.title} — Personal Records`:'Personal Records — The Listening Room';if(album){animate(detail,{opacity:[0,1],y:[40,0],duration:550,ease:'outCubic'});$('#detail-title').focus({preventScroll:true})}window.scrollTo(0,0)}
+$('#back').addEventListener('click',()=>{location.hash='';setTimeout(()=>$('#album-detail').focus({preventScroll:true}),0)});$('#previous').addEventListener('click',()=>step(-1));$('#next').addEventListener('click',()=>step(1));
+let wheelSum=0,wheelTime=0;detail.addEventListener('wheel',e=>{if(e.ctrlKey)return;const canScroll=detail.scrollHeight>detail.clientHeight+2;if(canScroll&&((e.deltaY>0&&detail.scrollTop+detail.clientHeight<detail.scrollHeight-2)||(e.deltaY<0&&detail.scrollTop>0)))return;e.preventDefault();const now=Date.now();if(now-wheelTime<650||changing)return;wheelSum+=e.deltaY;if(Math.abs(wheelSum)>45){step(Math.sign(wheelSum));wheelSum=0;wheelTime=now}},{passive:false});
+document.addEventListener('keydown',e=>{if(detail.hidden||shelf.open||e.altKey||e.ctrlKey||e.metaKey)return;if(['ArrowRight','ArrowLeft'].includes(e.key)){e.preventDefault();step(e.key==='ArrowRight'?1:-1)}});
+window.addEventListener('hashchange',route);$('#year').textContent=new Date().getFullYear();updateAlbum();route();setupSoundtrack();
