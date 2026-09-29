@@ -6,4 +6,4 @@ export const albums = [
  {id:'ai',title:'AI',english:'A little beyond',era:'2026 —',color:'#b27555',cover:'What\nif?',tag:'AI / EXPERIMENTS'}
 ];
 const projectEntries=[['PROJECT NOTES','생각을 실제로 만드는 과정','프로젝트의 출발점과 해결하려던 문제를 소개할 공간입니다. 상세 내용은 곧 채워집니다.'],['BEHIND THE WORK','선택과 시도, 그리고 발견','담당 역할과 구현 과정, 가장 어려웠던 문제와 해결 경험을 담을 예정입니다.'],['NEXT CHAPTER','계속 만들어 가는 중','결과와 배운 점, 다음 시도를 기록하는 공간입니다.']];
-albums.forEach((album,index)=>{album.number=String(index+1).padStart(2,'0');album.entries??=projectEntries});
+albums.forEach((album,index)=>{album.artwork=`./assets/collection/${album.id}.webp`;album.sleeveTitle=['Introduce\nMyself','University\nYears','Unreal Engine\n& Blender','Web\nServices','AI'][index];album.number=String(index+1).padStart(2,'0');album.entries??=projectEntries});

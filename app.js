@@ -1,4 +1,4 @@
-import { albums } from './albums.js';
+import { albums } from './albums.js?v=9';
 import { motionReady, reducedMotion } from './motion.js';
 import { setupSoundtrack } from './audio.js';
 let selected=albums[0],slide=0,motion,changing=false;
@@ -16,7 +16,7 @@ function cabinet(){
   const slot=document.createElement('div');slot.className='cubby';slot.dataset.album=album.id;
   const button=document.createElement('button');button.className='record-slot';button.disabled=album===selected;button.setAttribute('aria-label',`${album.title} · ${album.era}${album===selected?' · 현재 선택한 LP':' 선택'}`);
   if(album===selected){button.innerHTML='<span class="empty-ring" aria-hidden="true"></span><span class="on-turntable">ON THE<br>TURNTABLE</span>';slot.classList.add('is-empty')}
-  else{const cover=document.createElement('span');cover.className='album-cover';cover.style.setProperty('--cover',album.color);const n=document.createElement('small');n.textContent=`PERSONAL RECORDS / ${album.number}`;const title=document.createElement('strong');title.textContent=album.cover;const sub=document.createElement('span');sub.textContent=album.tag;cover.append(n,title,sub);button.append(cover)}
+  else{const cover=document.createElement('span');cover.className='album-cover';const artwork=document.createElement('img');artwork.src=album.artwork;artwork.alt='';artwork.draggable=false;artwork.className='sleeve-art';const title=document.createElement('strong');title.textContent=album.sleeveTitle;const sub=document.createElement('span');sub.textContent=album.era;cover.append(artwork,title,sub);button.append(cover)}
   const plaque=document.createElement('div');plaque.className='plaque';const name=document.createElement('strong');name.textContent=album.title;const era=document.createElement('small');era.textContent=album.era;plaque.append(name,era);if(album.id==='campus'){const note=document.createElement('small');note.textContent='ICT융합학부 및 학부연구생';plaque.append(note)}
   button.addEventListener('click',()=>selectAlbum(album,button));slot.append(button,plaque);$('#cabinet').append(slot);
  });

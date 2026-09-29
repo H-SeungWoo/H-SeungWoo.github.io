@@ -4,7 +4,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#11110f"><meta name="description" content="H-SeungWoo의 배움, 작업, 취향을 담은 작은 리스닝 룸.">
 <title>Personal Records — The Listening Room</title>
-<link rel="stylesheet" href="./style.css?v=8"><script type="module" src="./app.js?v=8"></script><script type="module" src="./scene.js?v=8"></script>
+<link rel="stylesheet" href="./style.css?v=9"><script type="module" src="./app.js?v=9"></script><script type="module" src="./scene.js?v=9"></script>
 <style>
 body[data-entrance="loading"] :is(.header,.intro,.tracks,.scene-caption,.shelf-handle,.listening-note,footer,.session-player){opacity:0;visibility:hidden;pointer-events:none}
 .fallback-record{display:none}
@@ -15,8 +15,8 @@ body[data-entrance="loading"] :is(.header,.intro,.tracks,.scene-caption,.shelf-h
 <a class="skip" href="#main">본문으로 건너뛰기</a>
 <div class="room-light" aria-hidden="true"></div>
 <header class="header"><a class="brand" href="#" aria-label="Personal Records 홈"><span class="brand-mark">◉</span><span>PERSONAL<br>RECORDS<span class="brand-dot">®</span></span></a><span class="header-note">THE LISTENING ROOM &nbsp; / &nbsp; VOL. 001</span><button id="sound" class="sound" aria-pressed="false"><span class="sound-icon">▂ ▅ ▃ ▆</span><span id="sound-label">SOUND OFF</span></button></header>
-<button id="shelf-open" class="shelf-handle" aria-haspopup="dialog" aria-controls="shelf"><span class="sleeves-icon" aria-hidden="true">▥</span><span>LP 컬렉션<small>5 RECORDS</small></span><span aria-hidden="true">›</span></button>
-<dialog id="shelf" aria-labelledby="shelf-title"><div class="cabinet-heading"><div><span class="eyebrow">THE PERSONAL ARCHIVE</span><h2 id="shelf-title">Record collection<span>.</span></h2></div><button id="shelf-close" aria-label="컬렉션 닫기">닫기 ×</button></div><p class="cabinet-intro">한 장의 LP, 하나의 이야기.<br>듣고 싶은 기록을 꺼내보세요.</p><div id="cabinet" class="cabinet"></div><div class="cabinet-footer"><span>CURATED BY H-SEUNGWOO</span><span>33⅓ RPM · STEREO</span></div><p class="shelf-help" id="shelf-status" aria-live="polite">빈자리는 지금 턴테이블에 올려진 LP입니다.</p></dialog>
+<button id="shelf-open" class="shelf-handle" aria-haspopup="dialog" aria-controls="shelf"><span class="sleeves-icon" aria-hidden="true">☰</span><span>LP 컬렉션<small>5 RECORDS</small></span></button>
+<dialog id="shelf" aria-labelledby="shelf-title"><div class="cabinet-stage"><div class="cabinet-heading"><div><span class="eyebrow">THE PERSONAL ARCHIVE</span><h2 id="shelf-title">Record collection<span>.</span></h2></div><button id="shelf-close" aria-label="컬렉션 닫기">닫기 ×</button></div><p class="cabinet-intro">한 장의 LP, 하나의 이야기.<br>듣고 싶은 기록을 꺼내보세요.</p><div id="cabinet" class="cabinet"></div></div><div class="cabinet-footer"><span>CURATED BY H-SEUNGWOO</span><span>33⅓ RPM · STEREO</span></div><p class="shelf-help" id="shelf-status" aria-live="polite">빈자리는 지금 턴테이블에 올려진 LP입니다.</p></dialog>
 <main id="main">
 <section class="intro"><div class="eyebrow"><span class="dot"></span> A FEW THINGS THAT MAKE ME, ME.</div><h1>Life, in <em>rotation.</em></h1><p>배우고, 만들고, 좋아하는 것들.<br>나의 기록이 음악이 되는 작은 공간.</p></section>
 <section class="collection" aria-label="포트폴리오 트랙 선택">

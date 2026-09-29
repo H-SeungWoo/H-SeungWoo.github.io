@@ -43,3 +43,10 @@ Three.js는 버전이 고정된 jsDelivr CDN에서 불러오며 글꼴은 Google
 - Shelf: labeled left-side handle; native modal dialog, Escape, outside click, focus return; walnut cabinet and brass plaques.
 - Initial record is stationary. PLAY RECORD or choosing another LP starts rotation and requests audio. Album navigation never recreates the soundtrack.
 - Reduced motion keeps the camera in its top view and removes animated transitions. Content remains accessible without Three.js.
+
+## Supplied visual assets
+Original PNGs remain locally in `assets/collection`. Published WebP copies use the same artwork, resized and compressed for delivery. CSS positions transparent margins without altering the originals.
+- Cabinet: supplied image 2; handle: 3; brass plaque: 4.
+- Album covers: introduction 5 (confirmed), campus 6, Unreal/Blender 7, web 8, AI 9.
+- Sprite sheets are reserved for components without individual assets; no alternative covers were substituted.
+- Titles and plaques remain live HTML text. Existing 3D camera entrance and continuous soundtrack are retained.

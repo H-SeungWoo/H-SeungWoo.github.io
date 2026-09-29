@@ -1,4 +1,4 @@
-import { albums } from './albums.js';
+import { albums } from './albums.js?v=9';
 import { motionReady } from './motion.js';
 // A compact, procedural Three.js turntable. No external model or texture files.
 const host = document.querySelector('#scene');
