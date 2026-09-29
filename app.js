@@ -1,11 +1,14 @@
 import { albums } from './albums.js?v=9';
 import { motionReady, reducedMotion } from './motion.js';
-import { setupSoundtrack } from './audio.js';
+import { setupSoundtrack } from './audio.js?v=11';
 let selected=albums[0],slide=0,motion,changing=false;
 const $=s=>document.querySelector(s),shelf=$('#shelf'),detail=$('#detail');
 motionReady.then(m=>motion=m);
 function paintRotation(playing){document.body.classList.toggle('record-playing',playing);$('#rotation').setAttribute('aria-pressed',String(playing));$('#rotation').setAttribute('aria-label',playing?'레코드 회전 일시정지':'레코드 재생');$('#rotation').textContent=playing?'Ⅱ  33⅓ RPM':'▶  PLAY RECORD'}
 document.addEventListener('record-play',()=>paintRotation(true));
+document.addEventListener('record-pause',()=>paintRotation(false));
+document.addEventListener('record-toggle',()=>document.dispatchEvent(new Event(document.body.dataset.audioState==='blocked'?'record-play':document.body.classList.contains('record-playing')?'record-pause':'record-play')));
+paintRotation(true);
 $('#rotation').addEventListener('click',()=>{if(document.body.classList.contains('record-playing')){paintRotation(false);document.dispatchEvent(new Event('record-pause'))}else document.dispatchEvent(new Event('record-play'))});
 $('#shelf-open small').textContent=`${albums.length} RECORDS`;
 
@@ -26,7 +29,7 @@ function updateAlbum(){document.body.dataset.album=selected.id;$('#album-title')
 async function closeShelf(){if(!shelf.open)return;await animate(shelf,{x:[0,-45],opacity:[1,0],duration:220,ease:'inQuad'});shelf.close();shelf.style.removeProperty('transform');shelf.style.removeProperty('opacity');document.body.classList.remove('shelf-open');$('#shelf-open').setAttribute('aria-expanded','false');$('#shelf-open').focus()}
 $('#shelf-open').addEventListener('click',()=>{cabinet();shelf.showModal();document.body.classList.add('shelf-open');$('#shelf-open').setAttribute('aria-expanded','true');animate(shelf,{x:['-100%',0],opacity:[.5,1],duration:520,ease:'outCubic'});$('#shelf-close').focus()});
 $('#shelf-close').addEventListener('click',closeShelf);shelf.addEventListener('cancel',e=>{e.preventDefault();closeShelf()});shelf.addEventListener('click',e=>{if(e.target===shelf){const r=shelf.getBoundingClientRect();if(e.clientX>r.right||e.clientY>r.bottom||e.clientX<r.left||e.clientY<r.top)closeShelf()}});
-async function selectAlbum(album,button){if(changing)return;changing=true;document.dispatchEvent(new Event('record-play'));await animate(button,{y:[0,-12],scale:[1,1.04],opacity:[1,0],duration:240,ease:'inQuad'});selected=album;updateAlbum();await closeShelf();changing=false;$('#album-detail').focus({preventScroll:true})}
+async function selectAlbum(album,button){if(changing)return;changing=true;await animate(button,{y:[0,-12],scale:[1,1.04],opacity:[1,0],duration:240,ease:'inQuad'});selected=album;updateAlbum();await closeShelf();changing=false;$('#album-detail').focus({preventScroll:true})}
 function renderSlide(){const [tag,title,copy]=selected.entries[slide];$('#detail-kicker').textContent=`${selected.number} / ${selected.title} · ${selected.era}`;$('#detail-number').textContent=String(slide+1).padStart(2,'0');$('#detail-title').textContent=title;$('#detail-description').textContent=tag;$('#detail-content').replaceChildren();const p=document.createElement('p');p.className='slide-copy';p.textContent=copy;$('#detail-content').append(p);if(selected.id==='about'&&slide===2){const link=document.createElement('a');link.className='github-link';link.href='https://github.com/H-SeungWoo';link.target='_blank';link.rel='noopener noreferrer';link.textContent='GitHub · H-SeungWoo ↗';$('#detail-content').append(link)}$('#slide-count').textContent=`${String(slide+1).padStart(2,'0')} / ${String(selected.entries.length).padStart(2,'0')}`;$('#previous').disabled=slide===0;$('#next').disabled=slide===selected.entries.length-1}
 async function step(direction){if(changing||detail.hidden)return;const next=slide+direction;if(next<0||next>=selected.entries.length)return;changing=true;await animate([$('.detail-heading'),$('#detail-content')],{opacity:[1,0],x:[0,-direction*24],duration:160,ease:'inQuad'});slide=next;renderSlide();await animate([$('.detail-heading'),$('#detail-content')],{opacity:[0,1],x:[direction*32,0],duration:360,ease:'outCubic'});changing=false}
 function route(){const album=albums.find(a=>a.id===location.hash.slice(1));if(album){if(selected!==album){selected=album;updateAlbum()}slide=0;renderSlide()}detail.hidden=!album;document.body.classList.toggle('detail-mode',!!album);$('.collection').inert=!!album;$('#shelf-open').hidden=!!album;document.title=album?`${album.title} — Personal Records`:'Personal Records — The Listening Room';if(album){animate(detail,{opacity:[0,1],y:[40,0],duration:550,ease:'outCubic'});$('#detail-title').focus({preventScroll:true})}window.scrollTo(0,0)}

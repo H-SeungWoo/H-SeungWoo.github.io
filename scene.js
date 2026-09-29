@@ -71,16 +71,22 @@ try {
   let rotating=document.body.classList.contains('record-playing');
   let width=1,height=1,active=false,hover=0,targetHover=0,angle=0,velocity=3.49,last=0,raf=0,disposed=false;
   const look=new THREE.Vector3(), target=new THREE.Vector3(); const cameraIntro={progress:reduced.matches?1:0}; let introAnimation; camera.up.set(0,0,-1);
-  function resize(){const rect=host.getBoundingClientRect();width=rect.width;height=rect.height;if(!width||!height)return;renderer.setSize(width,height,false);camera.aspect=width/height;camera.updateProjectionMatrix();if(reduced.matches)draw(performance.now())}
+  function resize(){const rect=host.getBoundingClientRect();width=rect.width;height=rect.height;if(!width||!height)return;renderer.setSize(width,height,false);camera.aspect=width/height;camera.updateProjectionMatrix();renderer.render(scene,camera)}
   const observer=new ResizeObserver(resize);observer.observe(host);
   function state(){active=albums.some(a=>'#'+a.id===location.hash);if(reduced.matches)draw(performance.now())}
   window.addEventListener('hashchange',state);state();
   const rotationButton=document.querySelector('#rotation');
+  const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
+  host.setAttribute('role','button');host.setAttribute('tabindex','0');
+  function describe(){host.setAttribute('aria-label',rotating?'LP · 음악 일시정지':'LP · 음악 재생');host.setAttribute('aria-pressed',String(rotating))}
+  host.addEventListener('click',event=>{const rect=host.getBoundingClientRect();pointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(pointer,camera);if(raycaster.intersectObject(surface).length)document.dispatchEvent(new Event('record-toggle'))});
+  host.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();document.dispatchEvent(new Event('record-toggle'))}});
+  document.addEventListener('record-play',()=>{rotating=true;describe()});document.addEventListener('record-pause',()=>{rotating=false;describe()});describe();
   function play(){rotating=true;document.body.classList.add('record-playing');rotationButton.setAttribute('aria-pressed','true');rotationButton.textContent='Ⅱ  33⅓ RPM';rotationButton.setAttribute('aria-label','레코드 회전 일시정지')}
   document.addEventListener('record-play',play);
   document.addEventListener('record-pause',()=>rotating=false);
   function albumLabel(album){const ctx=label.image.getContext('2d');ctx.fillStyle=album.color;ctx.fillRect(0,0,1024,1024);ctx.fillStyle='#231c17';ctx.textAlign='center';ctx.font='26px sans-serif';ctx.fillText('P E R S O N A L   R E C O R D S',512,230);ctx.font='italic 80px Georgia';album.cover.split('\n').forEach((line,i)=>ctx.fillText(line,512,355+i*95));ctx.font='30px sans-serif';ctx.fillText(album.title,512,680);ctx.font='24px sans-serif';ctx.fillText(album.era,512,745);ctx.fillText('No. '+album.number+'     /     33⅓ RPM',512,825);label.needsUpdate=true;if(reduced.matches)draw(performance.now())}
-  document.addEventListener('album-change',event=>{albumLabel(event.detail);motionReady.then(m=>{if(m&&!reduced.matches)m.animate(vinyl.position,{y:[1.9,.87],duration:850,ease:'outCubic'})})});
+  document.addEventListener('album-change',event=>albumLabel(event.detail));
   albumLabel(albums.find(a=>a.id===document.body.dataset.album)||albums[0]);
   document.querySelectorAll('[data-track]').forEach((el,index)=>{el.addEventListener('pointerenter',()=>targetHover=(index%2?1:-1));el.addEventListener('pointerleave',()=>targetHover=0)});
   function draw(time){if(disposed)return;const dt=Math.min((time-last)/1000||.016,.05);last=time;const narrow=matchMedia('(max-width:900px)').matches;
