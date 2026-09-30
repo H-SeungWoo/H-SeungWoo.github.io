@@ -1,17 +1,20 @@
 import { albums } from './albums.js?v=9';
-import { portfolio, getCanvaLinks } from './portfolio.js?v=14';
+import { portfolio, getCanvaLinks } from './portfolio.js?v=16';
 import { motionReady, reducedMotion } from './motion.js';
-import { setupSoundtrack } from './audio.js?v=11';
+import { setupSoundtrack } from './audio.js?v=16';
+import { setupGuide } from './guide.js?v=16';
 let selected=albums[0],motion,changing=false;
 const $=s=>document.querySelector(s),shelf=$('#shelf'),detail=$('#detail');
 const introductionTitle=$('#album-title').textContent;
 motionReady.then(m=>motion=m);
-function paintRotation(playing){document.body.classList.toggle('record-playing',playing);$('#rotation').setAttribute('aria-pressed',String(playing));$('#rotation').setAttribute('aria-label',playing?'레코드 회전 일시정지':'레코드 재생');$('#rotation').textContent=playing?'Ⅱ  33⅓ RPM':'▶  PLAY RECORD'}
+function paintRotation(playing){const idle=!document.body.dataset.audioState||document.body.dataset.audioState==='idle';document.body.classList.toggle('record-playing',playing);$('#rotation').setAttribute('aria-pressed',String(playing&&!idle));$('#rotation').setAttribute('aria-label',idle?'레코드 음악 재생':playing?'레코드 회전 일시정지':'레코드 재생');$('#rotation').textContent=playing&&!idle?'Ⅱ  33⅓ RPM':'▶  PLAY RECORD'}
 document.addEventListener('record-play',()=>paintRotation(true));
 document.addEventListener('record-pause',()=>paintRotation(false));
-document.addEventListener('record-toggle',()=>document.dispatchEvent(new Event(document.body.dataset.audioState==='blocked'?'record-play':document.body.classList.contains('record-playing')?'record-pause':'record-play')));
+document.addEventListener('soundtrack-playing',()=>paintRotation(document.body.classList.contains('record-playing')));
+function toggleRecord(){document.dispatchEvent(new Event(['idle','blocked'].includes(document.body.dataset.audioState)?'record-play':document.body.classList.contains('record-playing')?'record-pause':'record-play'))}
+document.addEventListener('record-toggle',toggleRecord);
 paintRotation(true);
-$('#rotation').addEventListener('click',()=>{if(document.body.classList.contains('record-playing')){paintRotation(false);document.dispatchEvent(new Event('record-pause'))}else document.dispatchEvent(new Event('record-play'))});
+$('#rotation').addEventListener('click',toggleRecord);
 $('#shelf-open small').textContent=`${albums.length} RECORDS`;
 
 function animate(el,options){if(!motion||reducedMotion.matches)return Promise.resolve();return new Promise(resolve=>motion.animate(el,{...options,onComplete:resolve}))}
@@ -58,4 +61,4 @@ notice.addEventListener('close',()=>$('#album-detail').focus({preventScroll:true
 $('#album-detail').addEventListener('click',e=>{if(selected.id!=='about'){e.preventDefault();showPreparing()}});
 function route(){let album=albums.find(a=>a.id===location.hash.slice(1));const unavailable=album&&album.id!=='about';if(unavailable){if(selected!==album){selected=album;updateAlbum()}history.replaceState(null,'',location.pathname+location.search);album=null}if(album){if(selected!==album){selected=album;updateAlbum()}renderPortfolio()}else $('#detail-content').replaceChildren();detail.hidden=!album;document.body.classList.toggle('detail-mode',!!album);$('.collection').inert=!!album;$('#shelf-open').hidden=!!album;document.title=album?`${album.title} — Personal Records`:'Personal Records — The Listening Room';if(album){animate(detail,{opacity:[0,1],y:[40,0],duration:550,ease:'outCubic'});$('#detail-title').focus({preventScroll:true})}window.scrollTo(0,0);if(unavailable)showPreparing()}
 $('#back').addEventListener('click',()=>{location.hash='';setTimeout(()=>$('#album-detail').focus({preventScroll:true}),0)});
-window.addEventListener('hashchange',route);$('#year').textContent=new Date().getFullYear();updateAlbum();route();setupSoundtrack();
+window.addEventListener('hashchange',route);$('#year').textContent=new Date().getFullYear();updateAlbum();route();setupSoundtrack();setupGuide();

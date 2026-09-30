@@ -22,7 +22,7 @@ Three.js는 버전이 고정된 jsDelivr CDN에서 불러오며 글꼴은 Google
 
 처음부터 레코드가 회전하며, 사선 구도에서 2.6초 동안 수직 탑뷰로 카메라가 이동합니다. 메뉴 선택 시 Anime.js로 전면 앨범 속지를 펼칩니다. 홈 복귀 시 완료된 탑뷰를 유지합니다. 세부 구조 선택 근거와 5개 후보는 DESIGN-DECISIONS.md에 기록되어 있습니다.
 
-음악은 단일 AudioBufferSource를 루프로 재생하며 메뉴 이동이 재생 위치나 소스를 초기화하지 않습니다. 진입 즉시 재생을 시도하지만, 브라우저가 자동재생을 차단하면 첫 클릭·터치·키 입력에서 시작합니다. SOUND 버튼은 음소거만 전환하며 현재 위치를 유지합니다. 운영체제나 브라우저 자체의 오디오 중지는 웹사이트가 강제로 해제하지 않습니다.
+음악은 첫 입장에 재생하지 않습니다. LP 또는 SOUND 버튼을 직접 눌렀을 때 시작하며, 다른 버튼을 눌러도 음악이 켜지지 않습니다. 단일 AudioBufferSource를 루프로 재생하므로 앨범이나 Canva 메뉴 이동이 재생 위치나 소스를 초기화하지 않습니다. LP는 재생/일시정지, SOUND 버튼은 재생 중 음소거를 전환하며 현재 위치를 유지합니다. 운영체제나 브라우저 자체의 오디오 중지는 웹사이트가 강제로 해제하지 않습니다.
 
 운영체제의 동작 줄이기 설정에서는 즉시 탑뷰가 표시되고 화면 전환 애니메이션은 생략됩니다. 숨겨진 탭에서는 3D 렌더링을 멈추며 오디오 소스는 페이지 이동과 무관하게 유지됩니다. WebGL 또는 애니메이션 CDN 실패 시에도 본문과 메뉴는 사용할 수 있습니다.
 ## 콘텐츠 교체
@@ -41,7 +41,7 @@ Three.js는 버전이 고정된 jsDelivr CDN에서 불러오며 글꼴은 Google
 - Add an album to that array to extend the three-column cabinet; its fixed slot is empty while selected.
 - Introduction opens the embedded Canva presentation. Page navigation and presentation animations are handled by the Canva viewer; the site does not intercept its wheel or arrow keys. Other album details show a coming-soon dialog.
 - Shelf: labeled left-side handle; native modal dialog, Escape, outside click, focus return; walnut cabinet and brass plaques.
-- The record starts rotating on entry and requests audio. Clicking the LP toggles playback; switching albums preserves the current playing/paused state. Album navigation never recreates the soundtrack.
+- The record starts rotating silently on entry. The first LP or SOUND click starts music; later LP clicks toggle playback. Switching albums preserves the current playing/paused state. Album navigation never recreates the soundtrack.
 - Reduced motion keeps the camera in its top view and removes animated transitions. Content remains accessible without Three.js.
 
 ## Supplied visual assets
@@ -56,3 +56,6 @@ Original PNGs remain locally in `assets/collection`. Published WebP copies use t
 Canva에서 공유 → 모두 보기 → 임베드로 생성한 HTML 코드의 iframe src를 `portfolio.js`에 설정합니다. 방문자에게 공개할 디자인의 임베드를 사용해야 합니다. 같은 디자인을 수정하면 Canva 임베드에 자동 반영되므로 이미지를 다시 내보낼 필요가 없습니다. 반영 시점은 Canva의 캐시에 따라 달라질 수 있습니다.
 
 자기소개 LP 상세에서 16:9 프레임에 Canva 뷰어를 표시합니다. 프레젠테이션 안의 페이지 이동, 링크, 애니메이션, 전체 화면은 Canva가 제공하는 기능을 사용합니다. 상단 ‘Canva에서 열기’는 같은 디자인의 보기 전용 페이지로 연결됩니다. 메인 화면으로 복귀해도 배경음악은 지속됩니다. PC와 태블릿을 기준으로 구성합니다.
+
+## 첫 방문 안내
+탑뷰 전환 완료 후 LP와 포트폴리오 버튼에 작은 안내를 표시합니다. 실제 음악 재생 후에는 상단 SOUND 버튼 안내가 나타납니다. 각 안내는 닫기 버튼 또는 해당 기능 사용으로 사라지며, 같은 브라우저의 localStorage에 각각 확인 여부를 기억합니다. 팝업으로 화면을 막거나 별도 입장 클릭을 요구하지 않습니다. 안내 문구는 `guide.js`의 `hints`에서 수정합니다.

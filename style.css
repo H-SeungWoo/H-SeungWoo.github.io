@@ -70,3 +70,16 @@ body:not(.detail-mode) .collection{min-height:500px}
 .portfolio-placeholder p{font-size:13px;line-height:1.8;color:#9f927e;text-align:center}
 .portfolio-help{font-size:10px;line-height:1.6;color:#9f927e;text-align:center;margin:13px 0 0}
 @media(min-width:901px) and (max-height:820px){.detail.canva-detail{height:calc(100dvh - 161px)}.portfolio-stage{max-width:calc((100dvh - 250px) * 16 / 9)}}
+
+/* Quiet, dismissible notes, revealed only after the camera arrives overhead. */
+.first-visit-guide{position:fixed;inset:0;z-index:14;pointer-events:none}
+.guide-note{position:absolute;width:230px;padding:17px 34px 17px 18px;border:1px solid #b9945a88;border-radius:4px;background:#211b13f2;color:#ecdfc7;box-shadow:0 8px 28px #0005;pointer-events:none;animation:guideArrival .5s ease-out both}
+.guide-label{display:block;font-size:7px;letter-spacing:1.6px;color:#c6a66f}
+.guide-note p{margin:10px 0 0;font-size:12px;line-height:1.8;word-break:keep-all}
+.guide-close{position:absolute;right:2px;top:2px;display:grid;place-items:center;width:30px;height:30px;padding:0;border:0;background:none;color:#bda47d;font-size:19px;pointer-events:auto}
+.guide-close:hover{color:#fff0d4}
+.guide-line{position:absolute;height:1px;background:#b9945a99;transform-origin:0 50%;pointer-events:none}
+.guide-line:after{content:'';position:absolute;right:-2px;top:-2px;width:5px;height:5px;border-radius:50%;background:#cfad73;box-shadow:0 0 7px #c6a66f44}
+@keyframes guideArrival{from{opacity:0}to{opacity:1}}
+@media(max-width:900px){.guide-note{width:205px;padding:14px 31px 14px 14px}.guide-note p{font-size:11px}.guide-label{font-size:6px}}
+@media(prefers-reduced-motion:reduce){.guide-note{animation:none}}

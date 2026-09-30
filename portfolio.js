@@ -1,6 +1,6 @@
 // Paste the iframe's src from Canva's Share → Embed HTML code here.
 export const portfolio = {
-  title: '한승우 AI 포트폴리오',
+  title: '포트폴리오',
   embedUrl: 'https://www.canva.com/design/DAHWoRWg2iI/i-9A8yrbSEEgpN6Uz5JlbQ/view?embed',
   aspectRatio: '16 / 9',
 };

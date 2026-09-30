@@ -78,7 +78,7 @@ try {
   const rotationButton=document.querySelector('#rotation');
   const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
   host.setAttribute('role','button');host.setAttribute('tabindex','0');
-  function describe(){host.setAttribute('aria-label',rotating?'LP · 음악 일시정지':'LP · 음악 재생');host.setAttribute('aria-pressed',String(rotating))}
+  function describe(){const playing=rotating&&document.body.dataset.audioState!=='idle';host.setAttribute('aria-label',playing?'LP · 음악 일시정지':'LP · 음악 재생');host.setAttribute('aria-pressed',String(playing))}
   host.addEventListener('click',event=>{const rect=host.getBoundingClientRect();pointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(pointer,camera);if(raycaster.intersectObject(surface).length)document.dispatchEvent(new Event('record-toggle'))});
   host.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();document.dispatchEvent(new Event('record-toggle'))}});
   document.addEventListener('record-play',()=>{rotating=true;describe()});document.addEventListener('record-pause',()=>{rotating=false;describe()});describe();
