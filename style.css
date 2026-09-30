@@ -47,3 +47,5 @@ dialog#shelf{width:min(56vw,850px);height:100dvh;padding:0 0 18px;background:#17
 html{scrollbar-gutter:stable}
 #scene{pointer-events:auto;cursor:pointer}#scene:focus-visible{outline:1px solid var(--accent);outline-offset:-35px}
 @media(min-width:901px){.scene-frame{transition:transform .5s cubic-bezier(.22,1,.36,1)}.shelf-open .scene-frame{left:18%;width:62%;transform:translateX(48%) scale(.78);transition:transform .5s cubic-bezier(.22,1,.36,1)}}
+
+#preparing{margin:auto;width:min(440px,90vw);padding:40px;border:1px solid #997549;border-radius:8px;background:#211810;color:#efe2cb;box-shadow:0 24px 90px #0009}#preparing::backdrop{background:#08060499}#preparing h2{font-size:25px;margin:18px 0 12px}#preparing p{color:#cbbda9;line-height:1.7}#preparing-close{display:block;margin:28px 0 0 auto;padding:10px 28px;border:1px solid #c79c58;background:#c79c58;color:#211810;border-radius:3px;cursor:pointer}#preparing-close:focus-visible{outline:2px solid #efe2cb;outline-offset:4px}
