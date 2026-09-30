@@ -27,7 +27,7 @@ Three.js는 버전이 고정된 jsDelivr CDN에서 불러오며 글꼴은 Google
 운영체제의 동작 줄이기 설정에서는 즉시 탑뷰가 표시되고 화면 전환 애니메이션은 생략됩니다. 숨겨진 탭에서는 3D 렌더링을 멈추며 오디오 소스는 페이지 이동과 무관하게 유지됩니다. WebGL 또는 애니메이션 CDN 실패 시에도 본문과 메뉴는 사용할 수 있습니다.
 ## 콘텐츠 교체
 
-`app.js` 상단 `tracks` 객체에서 제목, 짧은 설명, 상세 항목을 수정합니다. 지금은 전공과 GitHub 계정 외에는 예시입니다. 프로젝트 정리 Markdown을 받으면 실제 콘텐츠로 교체할 수 있습니다. 파일을 폴더에 넣는 것만으로 자동 반영되지는 않습니다.
+`albums.js`에서 LP의 제목과 커버를 수정합니다. 자기소개 상세는 Canva 프레젠테이션으로 표시하며, 나머지 네 LP의 상세는 준비 중 안내로 제한합니다. `portfolio.js`의 `embedUrl`에는 Canva가 생성한 HTML 임베드 코드의 iframe `src`를 넣습니다. 편집용 URL 또는 짧은 공유 링크는 사용하지 않습니다.
 
 현재 배경음은 직접 합성한 임시 재즈풍 연주이며 실제 재즈 녹음 음원이 아닙니다. 공개 사용이 허용된 음원으로 추후 교체할 수 있습니다.
 
@@ -39,9 +39,9 @@ Three.js는 버전이 고정된 jsDelivr CDN에서 불러오며 글꼴은 Google
 ## LP collection (2026-09)
 - Five albums live in `albums.js`: identity, campus, Unreal/Blender, web, AI.
 - Add an album to that array to extend the three-column cabinet; its fixed slot is empty while selected.
-- Each `entries` item is a slide: `[small label, title, body]`. The UI supports arrow buttons, left/right keys, and mouse wheel.
+- Introduction opens the embedded Canva presentation. Page navigation and presentation animations are handled by the Canva viewer; the site does not intercept its wheel or arrow keys. Other album details show a coming-soon dialog.
 - Shelf: labeled left-side handle; native modal dialog, Escape, outside click, focus return; walnut cabinet and brass plaques.
-- Initial record is stationary. PLAY RECORD or choosing another LP starts rotation and requests audio. Album navigation never recreates the soundtrack.
+- The record starts rotating on entry and requests audio. Clicking the LP toggles playback; switching albums preserves the current playing/paused state. Album navigation never recreates the soundtrack.
 - Reduced motion keeps the camera in its top view and removes animated transitions. Content remains accessible without Three.js.
 
 ## Supplied visual assets
@@ -50,3 +50,9 @@ Original PNGs remain locally in `assets/collection`. Published WebP copies use t
 - Album covers: introduction 5 (confirmed), campus 6, Unreal/Blender 7, web 8, AI 9.
 - Sprite sheets are reserved for components without individual assets; no alternative covers were substituted.
 - Titles and plaques remain live HTML text. Existing 3D camera entrance and continuous soundtrack are retained.
+
+
+## Canva portfolio
+Canva에서 공유 → 모두 보기 → 임베드로 생성한 HTML 코드의 iframe src를 `portfolio.js`에 설정합니다. 방문자에게 공개할 디자인의 임베드를 사용해야 합니다. 같은 디자인을 수정하면 Canva 임베드에 자동 반영되므로 이미지를 다시 내보낼 필요가 없습니다. 반영 시점은 Canva의 캐시에 따라 달라질 수 있습니다.
+
+자기소개 LP 상세에서 16:9 프레임에 Canva 뷰어를 표시합니다. 프레젠테이션 안의 페이지 이동, 링크, 애니메이션, 전체 화면은 Canva가 제공하는 기능을 사용합니다. 상단 ‘Canva에서 열기’는 같은 디자인의 보기 전용 페이지로 연결됩니다. 메인 화면으로 복귀해도 배경음악은 지속됩니다. PC와 태블릿을 기준으로 구성합니다.

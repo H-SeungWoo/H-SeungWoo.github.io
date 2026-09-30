@@ -49,3 +49,19 @@ html{scrollbar-gutter:stable}
 @media(min-width:901px){.scene-frame{transition:transform .5s cubic-bezier(.22,1,.36,1)}.shelf-open .scene-frame{left:18%;width:62%;transform:translateX(48%) scale(.78);transition:transform .5s cubic-bezier(.22,1,.36,1)}}
 
 #preparing{margin:auto;width:min(440px,90vw);padding:40px;border:1px solid #997549;border-radius:8px;background:#211810;color:#efe2cb;box-shadow:0 24px 90px #0009}#preparing::backdrop{background:#08060499}#preparing h2{font-size:25px;margin:18px 0 12px}#preparing p{color:#cbbda9;line-height:1.7}#preparing-close{display:block;margin:28px 0 0 auto;padding:10px 28px;border:1px solid #c79c58;background:#c79c58;color:#211810;border-radius:3px;cursor:pointer}#preparing-close:focus-visible{outline:2px solid #efe2cb;outline-offset:4px}
+
+/* Canva owns the presentation; the listening room remains its frame. */
+.detail.canva-detail{height:calc(100dvh - 185px);min-height:0;margin:18px 5% 78px;padding:0;background:transparent;border:0;box-shadow:none;overflow:visible;color:var(--ink)}
+.portfolio-toolbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px;min-height:46px;margin-bottom:14px;flex-shrink:0}
+.canva-detail .back{margin:0;align-self:center;font-size:9px;color:#bdab8d;min-height:40px}
+.portfolio-toolbar h2{font:400 21px 'Playfair Display',Georgia,serif;letter-spacing:-.3px;margin:0;color:#dfceb2}
+.portfolio-toolbar h2:focus{outline:none}
+.canva-open{justify-self:end;font-size:11px;color:#d1b27f;min-height:40px;display:flex;align-items:center;border-bottom:1px solid #b4945844}
+.canva-detail #detail-content{display:flex;flex:1;min-height:0;flex-direction:column;align-items:center;justify-content:center}
+.portfolio-stage{position:relative;width:100%;max-width:calc((100dvh - 274px) * 16 / 9);flex-shrink:0;background:#181410;border:1px solid #80654066;box-shadow:0 20px 65px #0005;overflow:hidden;border-radius:4px}
+.canva-frame{position:absolute;inset:0;width:100%;height:100%;border:0}
+.portfolio-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:30px;background:radial-gradient(ellipse at 50% 35%,#73532c26,transparent 70%)}
+.portfolio-placeholder h3{font:italic 400 clamp(30px,4vw,56px) 'Playfair Display',Georgia,serif;margin:25px 0 20px;color:#d7b887}
+.portfolio-placeholder p{font-size:13px;line-height:1.8;color:#9f927e;text-align:center}
+.portfolio-help{font-size:10px;line-height:1.6;color:#9f927e;text-align:center;margin:13px 0 0}
+@media(min-width:901px) and (max-height:820px){.detail.canva-detail{height:calc(100dvh - 161px)}.portfolio-stage{max-width:calc((100dvh - 250px) * 16 / 9)}}

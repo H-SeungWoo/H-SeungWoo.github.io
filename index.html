@@ -4,7 +4,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#11110f"><meta name="description" content="H-SeungWoo의 배움, 작업, 취향을 담은 작은 리스닝 룸.">
 <title>Personal Records — The Listening Room</title>
-<link rel="stylesheet" href="./style.css?v=12"><script type="module" src="./app.js?v=12"></script><script type="module" src="./scene.js?v=11"></script>
+<link rel="stylesheet" href="./style.css?v=14"><script type="module" src="./app.js?v=14"></script><script type="module" src="./scene.js?v=11"></script>
 <style>
 body[data-entrance="loading"] :is(.header,.intro,.tracks,.scene-caption,.shelf-handle,.listening-note,footer,.session-player){opacity:0;visibility:hidden;pointer-events:none}
 .fallback-record{display:none}
@@ -23,7 +23,7 @@ body[data-entrance="loading"] :is(.header,.intro,.tracks,.scene-caption,.shelf-h
 <section class="collection" aria-label="포트폴리오 트랙 선택">
 <div class="scene-frame" id="scene-frame"><div id="scene" role="img" aria-label="따뜻한 조명 아래 월넛 턴테이블과 회전하는 검은 레코드"></div><div class="fallback-record" aria-hidden="true"><div><span>PERSONAL<br><i>Records</i></span></div></div><span class="scene-caption"><span class="dot"></span> THE ORIGINAL PRESSING <button id="rotation" class="rotation-control" aria-pressed="false" aria-label="레코드 재생">▶ &nbsp; PLAY RECORD</button></span></div>
 <nav class="tracks" aria-label="현재 앨범"><a id="album-detail" class="track track-two" href="#about"><span class="track-meta">ON THE TURNTABLE <span id="album-number">01</span></span><span class="track-title"><span id="album-title">자기소개</span><span class="arrow">↗</span></span><span class="track-description" id="album-subtitle">Introduce myself</span><span class="track-bottom">앨범 펼쳐보기 <span>OPEN ↗</span></span></a></nav></section>
-<section id="detail" class="detail" hidden aria-labelledby="detail-title"><button id="back" class="back">← &nbsp; BACK TO THE COLLECTION</button><div class="detail-heading"><span id="detail-number" aria-hidden="true"></span><span id="detail-kicker" class="eyebrow"></span><h2 id="detail-title" tabindex="-1"></h2><p id="detail-description"></p></div><div id="detail-content"></div><div class="slide-controls"><button id="previous" aria-label="이전 슬라이드">←</button><span id="slide-count" aria-live="polite"></span><button id="next" aria-label="다음 슬라이드">→</button></div></section>
+<section id="detail" class="detail canva-detail" hidden aria-labelledby="detail-title"><div class="portfolio-toolbar"><button id="back" class="back">← &nbsp; BACK TO THE COLLECTION</button><h2 id="detail-title" tabindex="-1">한승우 · Portfolio</h2><a id="canva-open" class="canva-open" target="_blank" rel="noopener noreferrer" hidden>Canva에서 열기 ↗</a></div><div id="detail-content"></div></section>
 <div class="listening-note" id="listening-note"><span class="note-rule"></span><span>Every record tells a story.</span><span class="note-rule"></span><small>왼쪽 컬렉션에서 한 장을 골라, 나의 기록을 펼쳐보세요.</small></div>
 </main>
 <footer><span>© <span id="year"></span> H-SEUNGWOO</span><span class="footer-center">GOOD THINGS TAKE A LITTLE LISTENING.</span><span id="current-section">THE COLLECTION</span></footer>

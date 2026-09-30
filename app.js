@@ -1,7 +1,8 @@
 import { albums } from './albums.js?v=9';
+import { portfolio, getCanvaLinks } from './portfolio.js?v=14';
 import { motionReady, reducedMotion } from './motion.js';
 import { setupSoundtrack } from './audio.js?v=11';
-let selected=albums[0],slide=0,motion,changing=false;
+let selected=albums[0],motion,changing=false;
 const $=s=>document.querySelector(s),shelf=$('#shelf'),detail=$('#detail');
 motionReady.then(m=>motion=m);
 function paintRotation(playing){document.body.classList.toggle('record-playing',playing);$('#rotation').setAttribute('aria-pressed',String(playing));$('#rotation').setAttribute('aria-label',playing?'레코드 회전 일시정지':'레코드 재생');$('#rotation').textContent=playing?'Ⅱ  33⅓ RPM':'▶  PLAY RECORD'}
@@ -30,15 +31,30 @@ async function closeShelf(){if(!shelf.open)return;await animate(shelf,{x:[0,-45]
 $('#shelf-open').addEventListener('click',()=>{cabinet();shelf.showModal();document.body.classList.add('shelf-open');$('#shelf-open').setAttribute('aria-expanded','true');animate(shelf,{x:['-100%',0],opacity:[.5,1],duration:520,ease:'outCubic'});$('#shelf-close').focus()});
 $('#shelf-close').addEventListener('click',closeShelf);shelf.addEventListener('cancel',e=>{e.preventDefault();closeShelf()});shelf.addEventListener('click',e=>{if(e.target===shelf){const r=shelf.getBoundingClientRect();if(e.clientX>r.right||e.clientY>r.bottom||e.clientX<r.left||e.clientY<r.top)closeShelf()}});
 async function selectAlbum(album,button){if(changing)return;changing=true;await animate(button,{y:[0,-12],scale:[1,1.04],opacity:[1,0],duration:240,ease:'inQuad'});selected=album;updateAlbum();await closeShelf();changing=false;$('#album-detail').focus({preventScroll:true})}
-function renderSlide(){const [tag,title,copy]=selected.entries[slide];$('#detail-kicker').textContent=`${selected.number} / ${selected.title} · ${selected.era}`;$('#detail-number').textContent=String(slide+1).padStart(2,'0');$('#detail-title').textContent=title;$('#detail-description').textContent=tag;$('#detail-content').replaceChildren();const p=document.createElement('p');p.className='slide-copy';p.textContent=copy;$('#detail-content').append(p);if(selected.id==='about'&&slide===2){const link=document.createElement('a');link.className='github-link';link.href='https://github.com/H-SeungWoo';link.target='_blank';link.rel='noopener noreferrer';link.textContent='GitHub · H-SeungWoo ↗';$('#detail-content').append(link)}$('#slide-count').textContent=`${String(slide+1).padStart(2,'0')} / ${String(selected.entries.length).padStart(2,'0')}`;$('#previous').disabled=slide===0;$('#next').disabled=slide===selected.entries.length-1}
-async function step(direction){if(changing||detail.hidden)return;const next=slide+direction;if(next<0||next>=selected.entries.length)return;changing=true;await animate([$('.detail-heading'),$('#detail-content')],{opacity:[1,0],x:[0,-direction*24],duration:160,ease:'inQuad'});slide=next;renderSlide();await animate([$('.detail-heading'),$('#detail-content')],{opacity:[0,1],x:[direction*32,0],duration:360,ease:'outCubic'});changing=false}
+function renderPortfolio(){
+ const links=getCanvaLinks(),content=$('#detail-content');
+ $('#detail-title').textContent=portfolio.title;
+ $('#canva-open').hidden=!links;
+ if(links)$('#canva-open').href=links.view;else $('#canva-open').removeAttribute('href');
+ content.replaceChildren();
+ const stage=document.createElement('div');stage.className='portfolio-stage';stage.style.aspectRatio=portfolio.aspectRatio;
+ if(links){
+  const frame=document.createElement('iframe');frame.className='canva-frame';frame.src=links.embed;frame.title=portfolio.title+' · Canva';frame.allow='fullscreen';frame.allowFullscreen=true;frame.referrerPolicy='strict-origin-when-cross-origin';stage.append(frame);
+ }else{
+  const empty=document.createElement('div');empty.className='portfolio-placeholder';
+  const label=document.createElement('span');label.className='eyebrow';label.textContent='THE NEXT CHAPTER';
+  const title=document.createElement('h3');title.textContent='Portfolio, coming soon.';
+  const copy=document.createElement('p');copy.textContent='나의 이야기를 담은 포트폴리오를 준비하고 있습니다.';
+  empty.append(label,title,copy);stage.append(empty);
+ }
+ content.append(stage);
+ if(links){const hint=document.createElement('p');hint.className='portfolio-help';hint.textContent='슬라이드 안의 화살표로 페이지를 넘겨보세요. 화면이 보이지 않으면 Canva에서 열기를 이용해주세요.';content.append(hint)}
+}
 const notice=$('#preparing');
 function showPreparing(){if(!notice.open)notice.showModal()}
 $('#preparing-close').addEventListener('click',()=>notice.close());
 notice.addEventListener('close',()=>$('#album-detail').focus({preventScroll:true}));
 $('#album-detail').addEventListener('click',e=>{if(selected.id!=='about'){e.preventDefault();showPreparing()}});
-function route(){let album=albums.find(a=>a.id===location.hash.slice(1));const unavailable=album&&album.id!=='about';if(unavailable){if(selected!==album){selected=album;updateAlbum()}history.replaceState(null,'',location.pathname+location.search);album=null}if(album){if(selected!==album){selected=album;updateAlbum()}slide=0;renderSlide()}detail.hidden=!album;document.body.classList.toggle('detail-mode',!!album);$('.collection').inert=!!album;$('#shelf-open').hidden=!!album;document.title=album?`${album.title} — Personal Records`:'Personal Records — The Listening Room';if(album){animate(detail,{opacity:[0,1],y:[40,0],duration:550,ease:'outCubic'});$('#detail-title').focus({preventScroll:true})}window.scrollTo(0,0);if(unavailable)showPreparing()}
-$('#back').addEventListener('click',()=>{location.hash='';setTimeout(()=>$('#album-detail').focus({preventScroll:true}),0)});$('#previous').addEventListener('click',()=>step(-1));$('#next').addEventListener('click',()=>step(1));
-let wheelSum=0,wheelTime=0;detail.addEventListener('wheel',e=>{if(e.ctrlKey)return;const canScroll=detail.scrollHeight>detail.clientHeight+2;if(canScroll&&((e.deltaY>0&&detail.scrollTop+detail.clientHeight<detail.scrollHeight-2)||(e.deltaY<0&&detail.scrollTop>0)))return;e.preventDefault();const now=Date.now();if(now-wheelTime<650||changing)return;wheelSum+=e.deltaY;if(Math.abs(wheelSum)>45){step(Math.sign(wheelSum));wheelSum=0;wheelTime=now}},{passive:false});
-document.addEventListener('keydown',e=>{if(detail.hidden||shelf.open||e.altKey||e.ctrlKey||e.metaKey)return;if(['ArrowRight','ArrowLeft'].includes(e.key)){e.preventDefault();step(e.key==='ArrowRight'?1:-1)}});
+function route(){let album=albums.find(a=>a.id===location.hash.slice(1));const unavailable=album&&album.id!=='about';if(unavailable){if(selected!==album){selected=album;updateAlbum()}history.replaceState(null,'',location.pathname+location.search);album=null}if(album){if(selected!==album){selected=album;updateAlbum()}renderPortfolio()}else $('#detail-content').replaceChildren();detail.hidden=!album;document.body.classList.toggle('detail-mode',!!album);$('.collection').inert=!!album;$('#shelf-open').hidden=!!album;document.title=album?`${album.title} — Personal Records`:'Personal Records — The Listening Room';if(album){animate(detail,{opacity:[0,1],y:[40,0],duration:550,ease:'outCubic'});$('#detail-title').focus({preventScroll:true})}window.scrollTo(0,0);if(unavailable)showPreparing()}
+$('#back').addEventListener('click',()=>{location.hash='';setTimeout(()=>$('#album-detail').focus({preventScroll:true}),0)});
 window.addEventListener('hashchange',route);$('#year').textContent=new Date().getFullYear();updateAlbum();route();setupSoundtrack();
