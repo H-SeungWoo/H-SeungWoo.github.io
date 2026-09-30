@@ -4,6 +4,7 @@ import { motionReady, reducedMotion } from './motion.js';
 import { setupSoundtrack } from './audio.js?v=11';
 let selected=albums[0],motion,changing=false;
 const $=s=>document.querySelector(s),shelf=$('#shelf'),detail=$('#detail');
+const introductionTitle=$('#album-title').textContent;
 motionReady.then(m=>motion=m);
 function paintRotation(playing){document.body.classList.toggle('record-playing',playing);$('#rotation').setAttribute('aria-pressed',String(playing));$('#rotation').setAttribute('aria-label',playing?'레코드 회전 일시정지':'레코드 재생');$('#rotation').textContent=playing?'Ⅱ  33⅓ RPM':'▶  PLAY RECORD'}
 document.addEventListener('record-play',()=>paintRotation(true));
@@ -26,7 +27,7 @@ function cabinet(){
  });
  for(let i=0;i<(3-albums.length%3)%3;i++){const blank=document.createElement('div');blank.className='cubby future-slot';blank.innerHTML='<span>TO BE CONTINUED</span>';$('#cabinet').append(blank)}
 }
-function updateAlbum(){document.body.dataset.album=selected.id;$('#album-title').textContent=selected.title;$('#album-number').textContent=selected.number;$('#album-subtitle').textContent=selected.english;$('#album-detail').href=`#${selected.id}`;$('#current-section').textContent=`${selected.number} / ${selected.title}`;cabinet();document.dispatchEvent(new CustomEvent('album-change',{detail:selected}))}
+function updateAlbum(){document.body.dataset.album=selected.id;$('#album-title').textContent=selected.id==='about'?introductionTitle:selected.title;$('#album-number').textContent=selected.number;$('#album-subtitle').textContent=selected.english;$('#album-detail').href=`#${selected.id}`;$('#current-section').textContent=`${selected.number} / ${selected.title}`;cabinet();document.dispatchEvent(new CustomEvent('album-change',{detail:selected}))}
 async function closeShelf(){if(!shelf.open)return;await animate(shelf,{x:[0,-45],opacity:[1,0],duration:220,ease:'inQuad'});shelf.close();shelf.style.removeProperty('transform');shelf.style.removeProperty('opacity');document.body.classList.remove('shelf-open');$('#shelf-open').setAttribute('aria-expanded','false');$('#shelf-open').focus()}
 $('#shelf-open').addEventListener('click',()=>{cabinet();shelf.showModal();document.body.classList.add('shelf-open');$('#shelf-open').setAttribute('aria-expanded','true');animate(shelf,{x:['-100%',0],opacity:[.5,1],duration:520,ease:'outCubic'});$('#shelf-close').focus()});
 $('#shelf-close').addEventListener('click',closeShelf);shelf.addEventListener('cancel',e=>{e.preventDefault();closeShelf()});shelf.addEventListener('click',e=>{if(e.target===shelf){const r=shelf.getBoundingClientRect();if(e.clientX>r.right||e.clientY>r.bottom||e.clientX<r.left||e.clientY<r.top)closeShelf()}});

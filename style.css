@@ -45,6 +45,11 @@ dialog#shelf{width:min(56vw,850px);height:100dvh;padding:0 0 18px;background:#17
 @media(min-width:901px){.shelf-open .tracks{position:fixed;top:115px;right:4%;width:30%;max-width:360px}.shelf-open .track-bottom{margin-top:10px}.shelf-open .track-title{margin-top:10px}}
 /* Reserve the scrollbar across entrance and modal transitions. */
 html{scrollbar-gutter:stable}
+/* Reserve the scene's overflow in page flow, including its playback caption. */
+body:not(.detail-mode) .collection{min-height:500px}
+@media(min-width:1500px){body:not(.detail-mode) .collection{min-height:570px}}
+@media(min-width:901px) and (max-height:820px){body:not(.detail-mode) .collection{min-height:395px}}
+@media(max-width:900px){body:not(.detail-mode) .collection{min-height:460px}}
 #scene{pointer-events:auto;cursor:pointer}#scene:focus-visible{outline:1px solid var(--accent);outline-offset:-35px}
 @media(min-width:901px){.scene-frame{transition:transform .5s cubic-bezier(.22,1,.36,1)}.shelf-open .scene-frame{left:18%;width:62%;transform:translateX(48%) scale(.78);transition:transform .5s cubic-bezier(.22,1,.36,1)}}
 
