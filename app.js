@@ -13,7 +13,7 @@ document.addEventListener('record-pause',()=>paintRotation(false));
 document.addEventListener('soundtrack-playing',()=>paintRotation(document.body.classList.contains('record-playing')));
 function toggleRecord(){document.dispatchEvent(new Event(['idle','blocked'].includes(document.body.dataset.audioState)?'record-play':document.body.classList.contains('record-playing')?'record-pause':'record-play'))}
 document.addEventListener('record-toggle',toggleRecord);
-paintRotation(true);
+paintRotation(false);
 $('#rotation').addEventListener('click',toggleRecord);
 $('#shelf-open small').textContent=`${albums.length} RECORDS`;
 

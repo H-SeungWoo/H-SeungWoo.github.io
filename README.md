@@ -20,7 +20,7 @@ Three.js는 버전이 고정된 jsDelivr CDN에서 불러오며 글꼴은 Google
 
 ## 디자인과 동작
 
-처음부터 레코드가 회전하며, 사선 구도에서 2.6초 동안 수직 탑뷰로 카메라가 이동합니다. 메뉴 선택 시 Anime.js로 전면 앨범 속지를 펼칩니다. 홈 복귀 시 완료된 탑뷰를 유지합니다. 세부 구조 선택 근거와 5개 후보는 DESIGN-DECISIONS.md에 기록되어 있습니다.
+처음에는 레코드가 멈춰 있으며, 사선 구도에서 2.6초 동안 수직 탑뷰로 카메라가 이동합니다. LP 또는 SOUND 버튼을 누르면 회전과 음악이 함께 시작됩니다. 메뉴 선택 시 Anime.js로 전면 앨범 속지를 펼칩니다. 홈 복귀 시 완료된 탑뷰를 유지합니다. 세부 구조 선택 근거와 5개 후보는 DESIGN-DECISIONS.md에 기록되어 있습니다.
 
 음악은 첫 입장에 재생하지 않습니다. LP 또는 SOUND 버튼을 직접 눌렀을 때 시작하며, 다른 버튼을 눌러도 음악이 켜지지 않습니다. 단일 AudioBufferSource를 루프로 재생하므로 앨범이나 Canva 메뉴 이동이 재생 위치나 소스를 초기화하지 않습니다. LP는 재생/일시정지, SOUND 버튼은 재생 중 음소거를 전환하며 현재 위치를 유지합니다. 운영체제나 브라우저 자체의 오디오 중지는 웹사이트가 강제로 해제하지 않습니다.
 
@@ -41,7 +41,7 @@ Three.js는 버전이 고정된 jsDelivr CDN에서 불러오며 글꼴은 Google
 - Add an album to that array to extend the three-column cabinet; its fixed slot is empty while selected.
 - Introduction opens the embedded Canva presentation. Page navigation and presentation animations are handled by the Canva viewer; the site does not intercept its wheel or arrow keys. Other album details show a coming-soon dialog.
 - Shelf: labeled left-side handle; native modal dialog, Escape, outside click, focus return; walnut cabinet and brass plaques.
-- The record starts rotating silently on entry. The first LP or SOUND click starts music; later LP clicks toggle playback. Switching albums preserves the current playing/paused state. Album navigation never recreates the soundtrack.
+- The record is stationary and silent on entry. The first LP or SOUND click starts rotation and music; later LP clicks toggle playback. Switching albums preserves the current playing/paused state. Album navigation never recreates the soundtrack.
 - Reduced motion keeps the camera in its top view and removes animated transitions. Content remains accessible without Three.js.
 
 ## Supplied visual assets
