@@ -83,3 +83,18 @@ body:not(.detail-mode) .collection{min-height:500px}
 @keyframes guideArrival{from{opacity:0}to{opacity:1}}
 @media(max-width:900px){.guide-note{width:205px;padding:14px 31px 14px 14px}.guide-note p{font-size:11px}.guide-label{font-size:6px}}
 @media(prefers-reduced-motion:reduce){.guide-note{animation:none}}
+
+/* Warm, always-visible volume control beside the sound switch. */
+.sound-controls{display:flex;align-items:center;gap:18px;flex-shrink:0}
+.volume-control{display:grid;grid-template-columns:1fr auto;gap:5px 8px;width:118px;color:#ab9471;cursor:pointer}
+.volume-control>span{font-size:7px;letter-spacing:1.5px;align-self:center}
+.volume-control output{font-size:9px;letter-spacing:.5px;font-variant-numeric:tabular-nums;color:#d1b68d}
+#volume{--volume:43%;grid-column:1/-1;width:100%;height:20px;margin:0;padding:0;appearance:none;-webkit-appearance:none;background:transparent;cursor:pointer}
+#volume::-webkit-slider-runnable-track{height:2px;border-radius:2px;background:linear-gradient(to right,#c6a46d var(--volume),#65533d var(--volume))}
+#volume::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:12px;height:12px;margin-top:-5px;border:1px solid #e3c48d;border-radius:50%;background:#b79258;box-shadow:0 0 8px #bd965a30}
+#volume::-moz-range-track{height:2px;border-radius:2px;background:#65533d}
+#volume::-moz-range-progress{height:2px;background:#c6a46d}
+#volume::-moz-range-thumb{width:10px;height:10px;border:1px solid #e3c48d;border-radius:50%;background:#b79258}
+#volume:focus-visible{outline:1px solid var(--accent);outline-offset:4px;border-radius:3px}
+#volume:disabled{opacity:.35;cursor:default}
+@media(max-width:1000px){.sound-controls{gap:14px}.volume-control{width:100px}}

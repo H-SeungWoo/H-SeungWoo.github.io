@@ -2,21 +2,54 @@
 export function setupSoundtrack(){
   const button=document.querySelector('#sound'),label=document.querySelector('#sound-label');
   const status=document.querySelector('#play-status'),elapsed=document.querySelector('#elapsed'),hint=document.querySelector('#audio-hint');
+  const volumeInput=document.querySelector('#volume'),volumeValue=document.querySelector('#volume-value');
+  const volumeKey='personal-records:volume:v1';
   let context,master,buffer,source,preparation,startedAt=0;
   let muted=false,wanted=false,interacted=false,unavailable=false,wasAudible=false;
+  let volume=43,lastNonzero=43;
   const duration=22.4;
+
+  try{
+    const saved=JSON.parse(localStorage.getItem(volumeKey));
+    if(saved&&typeof saved.volume==='number'&&Number.isFinite(saved.volume)&&saved.volume>=0&&saved.volume<=100){
+      volume=Math.round(saved.volume);
+      if(typeof saved.lastNonzero==='number'&&Number.isFinite(saved.lastNonzero)&&saved.lastNonzero>=1&&saved.lastNonzero<=100)lastNonzero=Math.round(saved.lastNonzero);
+      if(volume>0)lastNonzero=volume;
+    }
+  }catch{}
+
+  function saveVolume(){
+    try{localStorage.setItem(volumeKey,JSON.stringify({volume,lastNonzero}))}catch{}
+  }
+
+  function applyVolume(){
+    if(master&&context)master.gain.setTargetAtTime(muted?0:volume/100,context.currentTime,.06);
+  }
+
+  function unmute(){
+    muted=false;
+    if(volume===0){volume=lastNonzero;saveVolume()}
+    applyVolume();
+  }
 
   function paint(){
     const running=wanted&&!!source&&context?.state==='running';
-    const audible=running&&!muted;
+    const silent=muted||volume===0;
+    const audible=running&&!silent;
     document.body.dataset.audioState=unavailable?'unavailable':!interacted?'idle':!wanted?'paused':running?'playing':'blocked';
-    document.body.dataset.soundMuted=String(muted);
+    document.body.dataset.soundMuted=String(silent);
+    if(volumeInput){
+      volumeInput.value=String(volume);
+      volumeInput.style.setProperty('--volume',`${volume}%`);
+      volumeInput.setAttribute('aria-valuetext',`${volume}%${muted&&volume>0?' (음소거)':''}`);
+    }
+    if(volumeValue)volumeValue.textContent=`${volume}%`;
     button.setAttribute('aria-pressed',String(audible));
     button.setAttribute('aria-label',audible?'소리 끄기':'소리 켜기');
     label.textContent=audible?'SOUND ON':'SOUND OFF';
-    status.textContent=audible?'AFTER HOURS · NOW PLAYING':running&&muted?'AFTER HOURS · MUTED':interacted&&!wanted?'AFTER HOURS · PAUSED':'AFTER HOURS · READY';
+    status.textContent=audible?'AFTER HOURS · NOW PLAYING':running&&silent?'AFTER HOURS · MUTED':interacted&&!wanted?'AFTER HOURS · PAUSED':'AFTER HOURS · READY';
     hint.textContent=unavailable?'이 브라우저에서는 오디오를 사용할 수 없습니다.':!interacted?'LP를 눌러 음악과 함께 둘러보세요.':!wanted?'LP를 눌러 음악을 이어서 들으세요.':!buffer?'음악을 준비하고 있습니다.':'LP를 눌러 음악을 시작하세요.';
-    hint.hidden=audible||muted;
+    hint.hidden=audible||silent;
     document.body.classList.toggle('music-playing',audible);
     if(source){
       const total=Math.max(0,Math.floor(context.currentTime-startedAt));
@@ -46,7 +79,7 @@ export function setupSoundtrack(){
       const Ctx=window.AudioContext||window.webkitAudioContext;
       const OfflineCtx=window.OfflineAudioContext||window.webkitOfflineAudioContext;
       if(!Ctx||!OfflineCtx)throw new Error('Web Audio is not supported');
-      context=new Ctx();master=context.createGain();master.gain.value=muted?0:.43;
+      context=new Ctx();master=context.createGain();master.gain.value=muted?0:volume/100;
       master.connect(context.destination);
       context.addEventListener('statechange',()=>wanted?start():suspend());
       const offline=new OfflineCtx(1,Math.ceil(duration*44100),44100);
@@ -80,14 +113,20 @@ export function setupSoundtrack(){
 
   document.addEventListener('record-play',play);
   document.addEventListener('record-pause',()=>{interacted=true;wanted=false;suspend()});
+  volumeInput?.addEventListener('input',()=>{
+    const next=Number(volumeInput.value);
+    if(!Number.isFinite(next)||next<0||next>100)return;
+    volume=Math.round(next);
+    if(volume>0){lastNonzero=volume;muted=false}
+    saveVolume();applyVolume();paint();
+  });
   button.addEventListener('click',()=>{
     if(!wanted||!source||context?.state!=='running'){
-      muted=false;
-      master?.gain.setTargetAtTime(.43,context.currentTime,.06);
+      unmute();
       document.dispatchEvent(new Event('record-play'));
     }else{
-      muted=!muted;
-      master.gain.setTargetAtTime(muted?0:.43,context.currentTime,.06);
+      if(muted||volume===0)unmute();
+      else{muted=true;applyVolume()}
       paint();
     }
   });

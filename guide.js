@@ -8,7 +8,7 @@ export function setupGuide(){
   const hints={
     lp:{target:document.querySelector('#scene'),label:'01 · MUSIC',copy:'레코드를 눌러 음악을 재생해보세요.',close:'음악 재생 안내 닫기'},
     portfolio:{target:document.querySelector('#album-detail'),label:'02 · PORTFOLIO',copy:'이곳을 눌러 포트폴리오를 펼쳐보세요.',close:'포트폴리오 안내 닫기'},
-    sound:{target:document.querySelector('#sound'),label:'SOUND CONTROL',copy:'여기서 소리를 켜고 끌 수 있어요.',close:'소리 조절 안내 닫기'},
+    sound:{target:document.querySelector('#sound'),label:'SOUND CONTROL',copy:'버튼으로 소리를 켜고 끄고, 슬라이더로 음량을 조절해보세요.',close:'소리 조절 안내 닫기'},
   };
   let soundEligible=false,frame=0;
   function remember(key){
@@ -68,6 +68,7 @@ export function setupGuide(){
   function schedule(){if(!frame)frame=requestAnimationFrame(()=>{frame=0;refresh()})}
   document.addEventListener('soundtrack-playing',()=>{soundEligible=true;remember('lp')});
   hints.sound.target.addEventListener('click',()=>{if(soundEligible)remember('sound')});
+  document.querySelector('#volume').addEventListener('input',()=>{if(soundEligible)remember('sound')});
   function viewedPortfolio(){if(location.hash==='#about')remember('portfolio');else schedule()}
   window.addEventListener('hashchange',viewedPortfolio);
   window.addEventListener('resize',schedule);window.addEventListener('scroll',schedule,{passive:true});
