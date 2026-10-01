@@ -8,7 +8,7 @@ export function setupSoundtrack(){
   const volumeInput=document.querySelector('#volume'),volumeValue=document.querySelector('#volume-value');
   const volumeKey='personal-records:volume:v1';
   let context,master,buffer,source,preparation,startedAt=0;
-  let muted=false,wanted=false,interacted=false,unavailable=false,wasAudible=false,panelOpen=false;
+  let wanted=false,interacted=false,unavailable=false,wasAudible=false,panelOpen=false;
   let volume=43,lastNonzero=43;
   const duration=22.4;
 
@@ -26,32 +26,31 @@ export function setupSoundtrack(){
   }
 
   function applyVolume(){
-    if(master&&context)master.gain.setTargetAtTime(muted?0:volume/100,context.currentTime,.06);
+    if(master&&context)master.gain.setTargetAtTime(volume/100,context.currentTime,.06);
   }
 
-  function unmute(){
-    muted=false;
+  function restoreVolume(){
     if(volume===0){volume=lastNonzero;saveVolume()}
     applyVolume();
   }
 
   function paint(){
     const running=wanted&&!!source&&context?.state==='running';
-    const silent=muted||volume===0;
+    const silent=volume===0;
     const audible=running&&!silent;
     document.body.dataset.audioState=unavailable?'unavailable':!interacted?'idle':!wanted?'paused':running?'playing':'blocked';
     document.body.dataset.soundMuted=String(silent);
     if(volumeInput){
       volumeInput.value=String(volume);
       volumeInput.style.setProperty('--volume',`${volume}%`);
-      volumeInput.setAttribute('aria-valuetext',`${volume}%${muted&&volume>0?' (음소거)':''}`);
+      volumeInput.setAttribute('aria-valuetext',`${volume}%`);
     }
     if(volumeValue)volumeValue.textContent=`${volume}%`;
-    button.setAttribute('aria-label',`사운드 설정 ${panelOpen?'닫기':'열기'} · ${audible?'소리 켜짐':'소리 꺼짐'}`);
-    toggle.setAttribute('aria-pressed',String(audible));
-    toggle.setAttribute('aria-label',audible?'소리 끄기':'소리 켜기');
-    toggleLabel.textContent=audible?'ON':'OFF';
-    label.textContent=audible?'SOUND ON':'SOUND OFF';
+    button.setAttribute('aria-label',`사운드 설정 ${panelOpen?'닫기':'열기'} · ${wanted?'배경음악 재생 중':'배경음악 정지'}`);
+    toggle.setAttribute('aria-pressed',String(wanted));
+    toggle.setAttribute('aria-label',wanted?'배경음악과 레코드 일시정지':'배경음악과 레코드 재생');
+    toggleLabel.textContent=wanted?'ON':'OFF';
+    label.textContent=wanted?'SOUND ON':'SOUND OFF';
     status.textContent=audible?'AFTER HOURS · NOW PLAYING':running&&silent?'AFTER HOURS · MUTED':interacted&&!wanted?'AFTER HOURS · PAUSED':'AFTER HOURS · READY';
     hint.textContent=unavailable?'이 브라우저에서는 오디오를 사용할 수 없습니다.':!interacted?'LP를 눌러 음악과 함께 둘러보세요.':!wanted?'LP를 눌러 음악을 이어서 들으세요.':!buffer?'음악을 준비하고 있습니다.':'LP를 눌러 음악을 시작하세요.';
     hint.hidden=audible||silent;
@@ -84,7 +83,7 @@ export function setupSoundtrack(){
       const Ctx=window.AudioContext||window.webkitAudioContext;
       const OfflineCtx=window.OfflineAudioContext||window.webkitOfflineAudioContext;
       if(!Ctx||!OfflineCtx)throw new Error('Web Audio is not supported');
-      context=new Ctx();master=context.createGain();master.gain.value=muted?0:volume/100;
+      context=new Ctx();master=context.createGain();master.gain.value=volume/100;
       master.connect(context.destination);
       context.addEventListener('statechange',()=>wanted?start():suspend());
       const offline=new OfflineCtx(1,Math.ceil(duration*44100),44100);
@@ -143,18 +142,12 @@ export function setupSoundtrack(){
     const next=Number(volumeInput.value);
     if(!Number.isFinite(next)||next<0||next>100)return;
     volume=Math.round(next);
-    if(volume>0){lastNonzero=volume;muted=false}
+    if(volume>0)lastNonzero=volume;
     saveVolume();applyVolume();paint();
   });
   toggle.addEventListener('click',()=>{
-    if(!wanted||!source||context?.state!=='running'){
-      unmute();
-      document.dispatchEvent(new Event('record-play'));
-    }else{
-      if(muted||volume===0)unmute();
-      else{muted=true;applyVolume()}
-      paint();
-    }
+    if(wanted)document.dispatchEvent(new Event('record-pause'));
+    else{restoreVolume();document.dispatchEvent(new Event('record-play'))}
   });
   // Opening settings is independent of playback and leaves the record untouched.
   button.removeAttribute('aria-pressed');
