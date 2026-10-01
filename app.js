@@ -1,8 +1,8 @@
 import { albums } from './albums.js?v=9';
 import { portfolio, getCanvaLinks } from './portfolio.js?v=16';
 import { motionReady, reducedMotion } from './motion.js';
-import { setupSoundtrack } from './audio.js?v=18';
-import { setupGuide } from './guide.js?v=18';
+import { setupSoundtrack } from './audio.js?v=19';
+import { setupGuide } from './guide.js?v=19';
 let selected=albums[0],motion,changing=false;
 const $=s=>document.querySelector(s),shelf=$('#shelf'),detail=$('#detail');
 const introductionTitle=$('#album-title').textContent;

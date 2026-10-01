@@ -1,11 +1,14 @@
 // One continuous soundtrack for the entire site. Navigation never touches this source.
 export function setupSoundtrack(){
   const button=document.querySelector('#sound'),label=document.querySelector('#sound-label');
+  const panel=document.querySelector('#sound-panel'),controls=button.closest('.sound-controls');
+  const toggle=document.querySelector('#sound-toggle'),toggleLabel=document.querySelector('#sound-toggle-label');
+  const closeButton=document.querySelector('#sound-close');
   const status=document.querySelector('#play-status'),elapsed=document.querySelector('#elapsed'),hint=document.querySelector('#audio-hint');
   const volumeInput=document.querySelector('#volume'),volumeValue=document.querySelector('#volume-value');
   const volumeKey='personal-records:volume:v1';
   let context,master,buffer,source,preparation,startedAt=0;
-  let muted=false,wanted=false,interacted=false,unavailable=false,wasAudible=false;
+  let muted=false,wanted=false,interacted=false,unavailable=false,wasAudible=false,panelOpen=false;
   let volume=43,lastNonzero=43;
   const duration=22.4;
 
@@ -44,8 +47,10 @@ export function setupSoundtrack(){
       volumeInput.setAttribute('aria-valuetext',`${volume}%${muted&&volume>0?' (음소거)':''}`);
     }
     if(volumeValue)volumeValue.textContent=`${volume}%`;
-    button.setAttribute('aria-pressed',String(audible));
-    button.setAttribute('aria-label',audible?'소리 끄기':'소리 켜기');
+    button.setAttribute('aria-label',`사운드 설정 ${panelOpen?'닫기':'열기'} · ${audible?'소리 켜짐':'소리 꺼짐'}`);
+    toggle.setAttribute('aria-pressed',String(audible));
+    toggle.setAttribute('aria-label',audible?'소리 끄기':'소리 켜기');
+    toggleLabel.textContent=audible?'ON':'OFF';
     label.textContent=audible?'SOUND ON':'SOUND OFF';
     status.textContent=audible?'AFTER HOURS · NOW PLAYING':running&&silent?'AFTER HOURS · MUTED':interacted&&!wanted?'AFTER HOURS · PAUSED':'AFTER HOURS · READY';
     hint.textContent=unavailable?'이 브라우저에서는 오디오를 사용할 수 없습니다.':!interacted?'LP를 눌러 음악과 함께 둘러보세요.':!wanted?'LP를 눌러 음악을 이어서 들으세요.':!buffer?'음악을 준비하고 있습니다.':'LP를 눌러 음악을 시작하세요.';
@@ -111,6 +116,27 @@ export function setupSoundtrack(){
     paint();
   }
 
+  function returnToSound(){
+    button.focus({preventScroll:true});
+    requestAnimationFrame(()=>{
+      if(!panelOpen&&(document.activeElement===document.body||panel.contains(document.activeElement)))button.focus({preventScroll:true});
+    });
+  }
+
+  function setPanel(open,{returnFocus=false}={}){
+    if(panelOpen===open){
+      if(!open&&returnFocus)returnToSound();
+      return;
+    }
+    panelOpen=open;
+    panel.hidden=!open;
+    button.setAttribute('aria-expanded',String(open));
+    paint();
+    if(open)toggle.focus({preventScroll:true});
+    else if(returnFocus)returnToSound();
+    document.dispatchEvent(new CustomEvent('sound-panel-change',{detail:{open}}));
+  }
+
   document.addEventListener('record-play',play);
   document.addEventListener('record-pause',()=>{interacted=true;wanted=false;suspend()});
   volumeInput?.addEventListener('input',()=>{
@@ -120,7 +146,7 @@ export function setupSoundtrack(){
     if(volume>0){lastNonzero=volume;muted=false}
     saveVolume();applyVolume();paint();
   });
-  button.addEventListener('click',()=>{
+  toggle.addEventListener('click',()=>{
     if(!wanted||!source||context?.state!=='running'){
       unmute();
       document.dispatchEvent(new Event('record-play'));
@@ -130,6 +156,38 @@ export function setupSoundtrack(){
       paint();
     }
   });
+  // Opening settings is independent of playback and leaves the record untouched.
+  button.removeAttribute('aria-pressed');
+  button.setAttribute('aria-expanded','false');
+  panel.hidden=true;
+  button.addEventListener('click',()=>setPanel(!panelOpen,{returnFocus:panelOpen}));
+  closeButton.addEventListener('click',()=>setPanel(false,{returnFocus:true}));
+  document.addEventListener('keydown',event=>{
+    if(panelOpen&&event.key==='Escape'){
+      event.preventDefault();
+      setPanel(false,{returnFocus:true});
+    }
+  });
+  document.addEventListener('pointerdown',event=>{
+    if(panelOpen&&!controls.contains(event.target))setPanel(false);
+  });
+  controls.addEventListener('focusout',event=>{
+    if(controls.contains(event.relatedTarget))return;
+    // Let the next control receive focus before treating a null relatedTarget as an exit.
+    setTimeout(()=>{
+      if(panelOpen&&!controls.contains(document.activeElement))setPanel(false);
+    },0);
+  });
+  window.addEventListener('hashchange',()=>setPanel(false));
+  window.addEventListener('scroll',()=>{
+    if(!panelOpen)return;
+    const anchor=button.getBoundingClientRect();
+    if(anchor.bottom<=0||anchor.top>=innerHeight)setPanel(false);
+  },{passive:true});
+  const modalChanges=new MutationObserver(()=>{
+    if(panelOpen&&document.querySelector('dialog[open]'))setPanel(false);
+  });
+  document.querySelectorAll('dialog').forEach(dialog=>modalChanges.observe(dialog,{attributes:true,attributeFilter:['open']}));
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)paint()});
   setInterval(paint,1000);paint();
 }
